@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ぱんだの分配管理 Pro</title>
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Yu Gothic",sans-serif;
+}
+body{
+    background:#f3f5f7;
+    color: #333;
+}
+header{
+    background:#1976d2;
+    color:white;
+    padding:15px;
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+}
+nav{
+    display:flex;
+    background:white;
+    box-shadow:0 2px 5px rgba(0,0,0,.15);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+nav button{
+    flex:1;
+    border:none;
+    background:white;
+    padding:15px;
+    font-size:16px;
+    cursor:pointer;
+}
+nav button.active{
+    background:#1976d2;
+    color:white;
+}
+.page{
+    display:none;
+    padding:15px;
+}
+.page.active{
+    display:block;
+}
+.card{
+    background:white;
+    border-radius:10px;
+    padding:15px;
+    margin-bottom:15px;
+    box-shadow:0 2px 5px rgba(0,0,0,.15);
+}
+h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    border-left: 4px solid #1976d2;
+    padding-left: 10px;
+}
+label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 14px;
+}
+input,select{
+    width:100%;
+    padding:12px;
+    margin-top:5px;
+    margin-bottom:10px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    font-size: 16px;
+}
+button.blue{
+    background:#1976d2;
+    color:white;
+    border:none;
+    padding:15px;
+    border-radius:8px;
+    width:100%;
+    cursor:pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+button.red{
+    background:#e53935;
+    color:white;
+    border:none;
+    padding:8px 15px;
+    border-radius:6px;
+    cursor:pointer;
+}
+button.green{
+    background:#4caf50;
+    color:white;
+    border:none;
+    padding:8px 15px;
+    border-radius:6px;
+    cursor:pointer;
+}
+button.gray{
+    background:#757575;
+    color:white;
+    border:none;
+    padding:8px 15px;
+    border-radius:6px;
+    cursor:pointer;
+}
+.listItem{
+    background:white;
+    border-radius:10px;
+    padding:15px;
+    margin-bottom:10px;
+    box-shadow:0 1px 4px rgba(0,0,0,.15);
+}
+.small{
+    color:#666;
+    font-size:13px;
+}
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.member-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+    background: #f9f9f9;
+    padding: 10px;
+    border-radius: 8px;
+}
+.member-chip {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+}
+.member-chip input {
+    width: auto;
+    margin: 0 10px 0 0;
+}
+.summary-box {
+    margin-top: 15px;
+    padding: 10px;
+    background: #e3f2fd;
+    border-radius: 8px;
+    text-align: center;
+}
+
+/* ステータスバッジ */
+.status-badge {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 5px;
+}
+.badge-unpaid { background: #e0e0e0; color: #666; }
+.badge-part { background: #ffe082; color: #b78103; }
+.badge-done { background: #c8e6c9; color: #2e7d32; }
+
+.editable-title {
+    cursor: pointer;
+    border-bottom: 1px dashed #1976d2;
+    display: inline-block;
+}
+.editable-title:hover {
+    background: #f0f7ff;
+}
+.edit-form-box {
+    background: #f9f9f9;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+    border: 1px solid #1976d2;
+}
+
+/* 受取人チェックボタンのスタイル */
+.receiver-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+.receiver-btn {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #555;
+    transition: all 0.2s;
+    user-select: none;
+}
+.receiver-btn.received {
+    background: #e8f5e9;
+    border-color: #81c784;
+    color: #2e7d32;
+    font-weight: bold;
+}
+</style>
+</head>
+<body>
+
+<header>
+ぱんだの分配管理
+</header>
+
+<nav>
+<button id="nav-list" class="active" onclick="showPage('list',this)">一覧</button>
+<button id="nav-member" onclick="showPage('member',this)">キャラ登録</button>
+<button id="nav-new" onclick="showPage('new',this)">新規登録</button>
+</nav>
+
+<div id="list" class="page active">
+    <div class="card">
+        <h2>分配一覧 <span style="font-size:12px; color:#666; font-weight:normal;">(名札タップで受取切替)</span></h2>
+        <div id="history"></div>
+    </div>
+</div>
+
+<div id="member" class="page">
+    <div class="card">
+        <h2>キャラ登録</h2>
+        <form onsubmit="addMember(event)">
+            <input id="memberName" placeholder="キャラ名を入力" autocomplete="off">
+            <button type="submit" class="blue">登録する</button>
+        </form>
+        <br>
+        <div id="memberList"></div>
+    </div>
+</div>
+
+<div id="new" class="page">
+    <div class="card">
+        <h2>新規分配の作成</h2>
+        
+        <label>日付</label>
+        <input type="date" id="date">
+
+        <label>アイテム名</label>
+        <input id="item" placeholder="例：漆黒の腕輪">
+
+        <label>総売却価格 (A) ※未売却時は空欄</label>
+        <input type="number" id="price" placeholder="例：1000000" oninput="calcPreview()">
+
+        <label>参加メンバーを選択</label>
+        <div id="participantList" class="member-selector">
+        </div>
+
+        <div class="summary-box">
+            <div id="calc-preview">
+                人数：0人 | 一人当たり：--- A
+            </div>
+        </div>
+        <br>
+        <button class="blue" onclick="saveHistory()">この内容で保存する</button>
+    </div>
+</div>
+
+<script>
+let members = JSON.parse(localStorage.getItem("members") || "[]");
+let history = JSON.parse(localStorage.getItem("history") || "[]");
+let editingIndex = null;
+
+function showPage(id, obj){
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+    obj.classList.add("active");
+
+    if(id === 'new') {
+        drawParticipantSelector();
+        calcPreview();
+    }
+    if(id === 'list') {
+        editingIndex = null;
+        drawHistory();
+    }
+}
+
+function saveLocal(){
+    localStorage.setItem("members", JSON.stringify(members));
+    localStorage.setItem("history", JSON.stringify(history));
+}
+
+function addMember(event){
+    if(event) event.preventDefault();
+    let name = document.getElementById("memberName").value.trim();
+    if(name == "") return;
+    if(members.includes(name)){
+        alert("その名前は既に登録されています");
+        return;
+    }
+    members.push(name);
+    document.getElementById("memberName").value = "";
+    saveLocal();
+    drawMembers();
+}
+
+function drawMembers(){
+    const list = document.getElementById("memberList");
+    list.innerHTML = "";
+    if(members.length === 0){
+        list.innerHTML = "<div class='small'>キャラが登録されていません</div>";
+        return;
+    }
+    members.forEach((name, index) => {
+        list.innerHTML += `
+        <div class="listItem flex-between">
+            <b>${name}</b>
+            <button class="red" onclick="deleteMember(${index})">削除</button>
+        </div>
+        `;
+    });
+}
+
+function deleteMember(index){
+    if(!confirm("削除してもよろしいですか？")) return;
+    members.splice(index, 1);
+    saveLocal();
+    drawMembers();
+}
+
+function drawParticipantSelector(){
+    const area = document.getElementById("participantList");
+    area.innerHTML = "";
+    if(members.length === 0){
+        area.innerHTML = "<div class='small' style='grid-column:1/3'>キャラ登録を先に行ってください</div>";
+        return;
+    }
+    members.forEach((name, index) => {
+        area.innerHTML += `
+        <label class="member-chip">
+            <input type="checkbox" name="participants" value="${name}" onchange="calcPreview()">
+            <span>${name}</span>
+        </label>
+        `;
+    });
+}
+
+function calcPreview(){
+    const priceInput = document.getElementById("price").value;
+    const checkedMembers = document.querySelectorAll('input[name="participants"]:checked');
+    const count = checkedMembers.length;
+    
+    let onePriceText = "--- A";
+    if (priceInput !== "" && count > 0) {
+        const price = Number(priceInput);
+        onePriceText = Math.floor(price / count).toLocaleString() + " A";
+    }
+    
+    document.getElementById("calc-preview").innerHTML = `
+        <strong>参加人数：${count} 人</strong><br>
+        <strong>一人当たり：${onePriceText}</strong>
+    `;
+}
+
+function saveHistory(){
+    const date = document.getElementById("date").value;
+    const item = document.getElementById("item").value.trim();
+    const priceInput = document.getElementById("price").value;
+    
+    const checkedNodes = document.querySelectorAll('input[name="participants"]:checked');
+    const selectedParticipants = Array.from(checkedNodes).map(node => node.value);
+    const count = selectedParticipants.length;
+
+    if(date == "" || item == "" || count <= 0 || (priceInput !== "" && Number(priceInput) < 0)){
+        alert("入力内容を確認してください（アイテム名・日付・メンバー1人以上が必須です）");
+        return;
+    }
+
+    const price = priceInput === "" ? null : Number(priceInput);
+    const onePrice = price === null ? null : Math.floor(price / count);
+
+    const participantStatus = selectedParticipants.map(name => ({
+        name: name,
+        received: false
+    }));
+
+    history.push({
+        date: date,
+        item: item,
+        price: price,
+        count: count,
+        participants: participantStatus,
+        onePrice: onePrice
+    });
+
+    saveLocal();
+    drawHistory();
+
+    document.getElementById("item").value = "";
+    document.getElementById("price").value = "";
+    document.getElementById("date").valueAsDate = new Date();
+
+    alert("保存しました！");
+    showPage('list', document.getElementById('nav-list'));
+}
+
+function startEdit(index) {
+    editingIndex = index;
+    drawHistory();
+}
+
+function cancelEdit() {
+    editingIndex = null;
+    drawHistory();
+}
+
+function updateHistory(index) {
+    const editItem = document.getElementById(`editItem-${index}`).value.trim();
+    const editPriceInput = document.getElementById(`editPrice-${index}`).value;
+    
+    if(editItem == "" || (editPriceInput !== "" && Number(editPriceInput) < 0)) {
+        alert("正しく入力してください");
+        return;
+    }
+
+    const currentData = history[index];
+    const price = editPriceInput === "" ? null : Number(editPriceInput);
+    const onePrice = price === null ? null : Math.floor(price / currentData.count);
+
+    history[index].item = editItem;
+    history[index].price = price;
+    history[index].onePrice = onePrice;
+
+    saveLocal();
+    editingIndex = null;
+    drawHistory();
+    alert("変更を保存しました");
+}
+
+// 受取ステータスを切り替える（チェックを外す時だけ確認を追加）
+function toggleReceived(historyIndex, participantIndex) {
+    if (typeof history[historyIndex].participants[participantIndex] === 'string') {
+        return; 
+    }
+    
+    const currentStatus = history[historyIndex].participants[participantIndex].received;
+    const name = history[historyIndex].participants[participantIndex].name;
+
+    // すでに受取済（true）のとき＝チェックを外すときは確認を出す
+    if (currentStatus === true) {
+        if (!confirm(`${name} さんを「未受取」に戻してもよろしいですか？`)) {
+            return; // キャンセルされたら何もしない
+        }
+    }
+    
+    // 反転させて保存
+    history[historyIndex].participants[participantIndex].received = !currentStatus;
+    saveLocal();
+    drawHistory();
+}
+
+function drawHistory(){
+    const area = document.getElementById("history");
+    area.innerHTML = "";
+    if(history.length === 0){
+        area.innerHTML = "<div class='small'>履歴はありません</div>";
+        return;
+    }
+
+    history.forEach((h, index) => {
+        const formattedParticipants = h.participants.map(p => {
+            return typeof p === 'string' ? { name: p, received: false } : p;
+        });
+        h.participants = formattedParticipants;
+
+        const receivedCount = h.participants.filter(p => p.received).length;
+        
+        if (editingIndex === index) {
+            const namesStr = h.participants.map(p => p.name).join(", ");
+            area.innerHTML += `
+            <div class="listItem edit-form-box">
+                <label style="margin-top:0;">アイテム名編集</label>
+                <input type="text" id="editItem-${index}" value="${h.item}">
+                <label>総売却価格 (A) ※未売却なら空欄</label>
+                <input type="number" id="editPrice-${index}" value="${h.price !== null ? h.price : ''}">
+                <div style="margin-top:10px; font-size:12px; color:#666;">
+                    👥 参加人数：${h.count} 人 (${namesStr})
+                </div>
+                <br>
+                <div class="flex-between">
+                    <button class="green" onclick="updateHistory(${index})">確定</button>
+                    <button class="gray" onclick="cancelEdit()">キャンセル</button>
+                </div>
+            </div>
+            `;
+        } else {
+            let priceDisplay = "未売却 (--- A)";
+            let onePriceDisplay = "--- A";
+            let statusBadge = "";
+            
+            if (h.price === null || h.price === undefined) {
+                statusBadge = `<span class="status-badge badge-unpaid">未売却</span>`;
+            } else if (receivedCount === h.count) {
+                priceDisplay = `${h.price.toLocaleString()} A`;
+                onePriceDisplay = `${h.onePrice.toLocaleString()} A`;
+                statusBadge = `<span class="status-badge badge-done">分配完了 🎉</span>`;
+            } else {
+                priceDisplay = `${h.price.toLocaleString()} A`;
+                onePriceDisplay = `${h.onePrice.toLocaleString()} A`;
+                statusBadge = `<span class="status-badge badge-part">分配中 (${receivedCount}/${h.count})</span>`;
+            }
+
+            let receiverButtons = "";
+            h.participants.forEach((p, pIdx) => {
+                const activeClass = p.received ? "received" : "";
+                const icon = p.received ? "⭕ " : "❌ ";
+                receiverButtons += `
+                    <span class="receiver-btn ${activeClass}" onclick="toggleReceived(${index}, ${pIdx})">
+                        ${icon}${p.name}
+                    </span>
+                `;
+            });
+            
+            area.innerHTML += `
+            <div class="listItem">
+                <div class="flex-between">
+                    <b class="editable-title" style="color:#1976d2; font-size:18px;" onclick="startEdit(${index})">
+                        ${h.item}${statusBadge} ✏️
+                    </b>
+                    <button class="red" style="padding:4px 8px; font-size:12px;" onclick="deleteHistory(${index})">削除</button>
+                </div>
+                <div style="margin-top:10px; line-height:1.6;">
+                    <span class="small" onclick="startEdit(${index})">📅 ${h.date}</span><br>
+                    <span onclick="startEdit(${index})">💰 総額：${priceDisplay}</span><br>
+                    <span onclick="startEdit(${index})">👥 人数：${h.count} 人</span><br>
+                    <span onclick="startEdit(${index})">💎 <b>一人当たり：${onePriceDisplay}</b></span><br>
+                    <div style="margin-top:8px; padding-top:8px; border-top:1px dashed #eee;">
+                        <span class="small" style="font-weight:bold; color:#555;">受取状況:</span>
+                        <div class="receiver-list">
+                            ${receiverButtons}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+    });
+}
+
+function deleteHistory(index){
+    if(!confirm("この履歴を削除しますか？")) return;
+    history.splice(index, 1);
+    saveLocal();
+    drawHistory();
+}
+
+drawMembers();
+drawHistory();
+document.getElementById("date").valueAsDate = new Date();
+</script>
+
+</body>
+</html>
+
