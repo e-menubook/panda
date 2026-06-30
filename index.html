@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ぱんだの分配管理 Pro</title>
+<title>ぱんだの分配管理</title>
 <style>
 *{
     margin:0;
@@ -175,7 +175,33 @@ button.gray{
 .badge-part { background: #ffe082; color: #b78103; }
 .badge-done { background: #c8e6c9; color: #2e7d32; }
 
-/* アコーディオン */
+/* 未受取キャラバッジエリア（右寄せ用） */
+.unreceived-badges-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-left: auto; /* 左側に自動でマージンを取ることで右寄せ */
+    padding-left: 15px; /* アイテム名やステータスとの間の最低限の余白 */
+    padding-right: 15px; /* 詳細ボタンとの間の余白 */
+}
+
+/* 未受取キャラバッジ */
+.unreceived-name-badge {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    cursor: pointer;
+    pointer-events: auto !important; /* ヘッダー全体のpointer-events:noneを打ち消す */
+}
+.unreceived-name-badge:hover {
+    background: #ffcdd2;
+}
+
+/* アコーディオン構造 */
 .accordion-header {
     padding: 15px;
     background: white;
@@ -185,14 +211,15 @@ button.gray{
     align-items: center;
     user-select: none;
 }
-.accordion-header:hover {
-    background: #fcfdfe;
+.accordion-header * {
+    pointer-events: none;
 }
 .accordion-title-block {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 5px;
+    flex: 1; /* タイトルブロックを可能な限り広げる */
 }
 .accordion-content {
     display: none;
@@ -238,6 +265,80 @@ button.gray{
     margin-bottom: 10px;
     border: 1px solid #1976d2;
 }
+
+/* モーダル（別窓）スタイル */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+.modal-overlay.active {
+    display: flex;
+}
+.modal-window {
+    background: white;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    overflow: hidden;
+    animation: fadeIn 0.2s ease-out;
+}
+@keyframes fadeIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+.modal-header {
+    background: #1976d2;
+    color: white;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.modal-close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+}
+.modal-body {
+    padding: 15px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+.modal-footer {
+    padding: 15px;
+    background: #f5f5f5;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 10px;
+}
+.unreceived-item-row {
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee;
+    font-size: 14px;
+}
+.modal-total-box {
+    margin-top: 15px;
+    padding: 12px;
+    background: #ffebee;
+    border-radius: 6px;
+    font-size: 16px;
+    color: #c62828;
+    text-align: right;
+}
 </style>
 </head>
 <body>
@@ -255,7 +356,7 @@ button.gray{
 
 <div id="list" class="page active">
     <div class="card">
-        <h2>分配一覧 <span style="font-size:12px; color:#666; font-weight:normal;">(タップで詳細を開閉)</span></h2>
+        <h2>分配一覧 <span style="font-size:12px; color:#666; font-weight:normal;">(タップで詳細を開閉 / 名前タップで一括管理)</span></h2>
         <div id="history"></div>
     </div>
 </div>
@@ -312,6 +413,25 @@ button.gray{
         <input type="password" id="confirmPassword" placeholder="もう一度入力">
         <br><br>
         <button class="blue" onclick="changePassword()">パスワードを変更する</button>
+    </div>
+</div>
+
+<!-- 未受取一括管理モーダル（別窓） -->
+<div id="unreceivedModal" class="modal-overlay" onclick="closeModal()">
+    <div class="modal-window" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <span id="modalTitle">キャラクター名</span>
+            <button class="modal-close-btn" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div style="font-weight: bold; margin-bottom: 10px; font-size: 14px; color:#555;">未受取アイテム一覧:</div>
+            <div id="modalItemList"></div>
+            <div id="modalTotalBox" class="modal-total-box"></div>
+        </div>
+        <div class="modal-footer">
+            <button id="modalBulkBtn" class="blue" style="padding: 10px; font-size: 14px;">この内容をすべて受取済にする</button>
+            <button class="gray" onclick="closeModal()" style="padding: 10px; font-size: 14px;">閉じる</button>
+        </div>
     </div>
 </div>
 
@@ -547,7 +667,44 @@ function saveHistory(){
     showPage('list', document.getElementById('nav-list'));
 }
 
-// 【完全復活】分配一覧の描画処理本体
+function toggleAccordion(index) {
+    openIndexes[index] = !openIndexes[index];
+    drawHistory();
+}
+
+function startEdit(index) {
+    editingIndex = index;
+    drawHistory();
+}
+
+function cancelEdit() {
+    editingIndex = null;
+    drawHistory();
+}
+
+function updateHistory(index) {
+    const editItem = document.getElementById(`editItem-${index}`).value.trim();
+    const editPriceInput = document.getElementById(`editPrice-${index}`).value;
+    
+    if(editItem == "" || (editPriceInput !== "" && Number(editPriceInput) < 0)) {
+        alert("正しく入力してください");
+        return;
+    }
+
+    const currentData = history[index];
+    const price = editPriceInput === "" ? null : Number(editPriceInput);
+    const onePrice = price === null ? null : Math.floor(price / currentData.count);
+
+    history[index].item = editItem;
+    history[index].price = price;
+    history[index].onePrice = onePrice;
+
+    saveLocal();
+    editingIndex = null;
+    drawHistory();
+    alert("変更を保存しました");
+}
+
 function drawHistory(){
     const area = document.getElementById("history");
     area.innerHTML = "";
@@ -561,7 +718,6 @@ function drawHistory(){
         const isOpen = openIndexes[index];
         const isEditing = (editingIndex === index);
 
-        // 各受取状況カウント
         const total = h.participants.length;
         const doneCount = h.participants.filter(p => p.received).length;
 
@@ -572,11 +728,24 @@ function drawHistory(){
             badge = `<span class="status-badge badge-done">分配完了 🎉</span>`;
         }
 
+        // 未受取のメンバー抽出
+        const unreceivedMembers = h.participants.filter(p => !p.received);
+        let unreceivedBadgesHtml = "";
+        if (unreceivedMembers.length > 0 && doneCount < total) {
+            unreceivedBadgesHtml += `<div class="unreceived-badges-wrapper">`;
+            unreceivedMembers.forEach(p => {
+                // バッジクリック時に親要素のアコーディオン開閉を発火させないため stopPropagation()
+                unreceivedBadgesHtml += `<span class="unreceived-name-badge" onclick="event.stopPropagation(); openUnreceivedSummary('${p.name}')">${p.name}</span>`;
+            });
+            unreceivedBadgesHtml += `</div>`;
+        } else {
+            unreceivedBadgesHtml = `<div class="unreceived-badges-wrapper"></div>`;
+        }
+
         const priceDisplay = h.price === null ? "未売却" : h.price.toLocaleString() + " A";
         const onePriceDisplay = h.onePrice === null ? "--- A" : h.onePrice.toLocaleString() + " A";
 
         if (isEditing) {
-            // 編集モードの見た目
             area.innerHTML += `
             <div class="listItem" style="padding:15px;">
                 <div class="edit-form-box">
@@ -594,13 +763,12 @@ function drawHistory(){
             return;
         }
 
-        // 通常表示（アコーディオン）
         let receiverButtons = "";
         h.participants.forEach((p, pIdx) => {
             const btnClass = p.received ? "receiver-btn received" : "receiver-btn";
             const mark = p.received ? "⭕" : "❌";
             receiverButtons += `
-                <div class="${btnClass}" onclick="toggleReceived(${index}, ${pIdx})">
+                <div class="${btnClass}" onclick="event.stopPropagation(); toggleReceived(${index}, ${pIdx});">
                     ${p.name} [${mark}]
                 </div>
             `;
@@ -617,6 +785,7 @@ function drawHistory(){
                     <strong style="font-size:15px; margin-left:5px;">${h.item}</strong>
                     ${badge}
                 </div>
+                ${unreceivedBadgesHtml}
                 <div>
                     <span style="font-size:12px; color:#1976d2; font-weight:bold;">${arrow}</span>
                 </div>
@@ -630,7 +799,7 @@ function drawHistory(){
                 </div>
                 
                 <div style="border-top:1px dashed #ddd; padding-top:10px; margin-bottom:15px;">
-                    <span class="small" style=\"font-weight:bold; color:#555;\">受取状況 (名札タップで切替):</span>
+                    <span class="small" style="font-weight:bold; color:#555;">受取状況 (名札タップで切替):</span>
                     <div class="receiver-list">
                         ${receiverButtons}
                     </div>
@@ -646,30 +815,111 @@ function drawHistory(){
     });
 }
 
-// 受取フラグ変更処理（受取を戻す[⭕→❌]時だけパスワードを要求する）
+// 別窓（モーダル）を開き、特定キャラの未受取リストを生成する
+function openUnreceivedSummary(memberName) {
+    document.getElementById("modalTitle").innerText = `【${memberName}】の未受取明細`;
+    
+    const listArea = document.getElementById("modalItemList");
+    listArea.innerHTML = "";
+    
+    let totalUnreceivedSum = 0;
+    let matchCount = 0;
+
+    history.forEach((h, hIdx) => {
+        // 対象キャラがその分配に参加しており、かつ未受取であるか判定
+        const pState = h.participants.find(p => p.name === memberName && !p.received);
+        if (pState) {
+            matchCount++;
+            const priceText = h.onePrice === null ? "未売却" : h.onePrice.toLocaleString() + " A";
+            if (h.onePrice !== null) {
+                totalUnreceivedSum += h.onePrice;
+            }
+            
+            listArea.innerHTML += `
+                <div class="unreceived-item-row">
+                    <span style="color:#777; font-size:12px;">[${h.date}]</span> 
+                    <strong>${h.item}</strong> 
+                    <span style="float:right; color:#1976d2; font-weight:bold;">${priceText}</span>
+                </div>
+            `;
+        }
+    });
+
+    if (matchCount === 0) {
+        listArea.innerHTML = "<div class='small'>未受取のアイテムはありません。</div>";
+        document.getElementById("modalTotalBox").style.display = "none";
+        document.getElementById("modalBulkBtn").style.display = "none";
+    } else {
+        document.getElementById("modalTotalBox").style.display = "block";
+        document.getElementById("modalTotalBox").innerHTML = `未受取 合計金額: <strong>${totalUnreceivedSum.toLocaleString()} A</strong>`;
+        
+        const bulkBtn = document.getElementById("modalBulkBtn");
+        bulkBtn.style.display = "block";
+        // ボタンに処理を仕込む（引数で名前を渡す）
+        bulkBtn.onclick = function() {
+            bulkReceiveAction(memberName);
+        };
+    }
+
+    document.getElementById("unreceivedModal").classList.add("active");
+}
+
+// 別窓を閉じる
+function closeModal() {
+    document.getElementById("unreceivedModal").classList.remove("active");
+}
+
+// 一括受取処理アクション
+function bulkReceiveAction(memberName) {
+    const savedPassword = localStorage.getItem("adminPassword");
+    
+    if (!confirm(`${memberName} さんの未受取アイテムをすべて「受取済」に変更します。よろしいですか？`)) {
+        return;
+    }
+
+    const userInput = prompt("一括処理を行うには管理用パスワードを入力してください：");
+    if (userInput === null) return;
+
+    if (userInput !== savedPassword) {
+        alert("パスワードが違います。変更できませんでした。");
+        return;
+    }
+
+    // 全履歴をループして対象キャラのステータスを書き換え
+    history.forEach((h) => {
+        h.participants.forEach((p) => {
+            if (p.name === memberName && !p.received) {
+                p.received = true;
+            }
+        });
+    });
+
+    saveLocal();
+    drawHistory();
+    closeModal();
+    alert(`${memberName} さんの未受取アイテムを一括受取済にしました。`);
+}
+
+// 受取フラグ変更処理
 function toggleReceived(historyIndex, participantIndex) {
     const currentStatus = history[historyIndex].participants[participantIndex].received;
     const name = history[historyIndex].participants[participantIndex].name;
     const savedPassword = localStorage.getItem("adminPassword");
 
     if (currentStatus === true) {
-        // ⭕から❌（受取を戻す）時だけパスワードを必要にする
         if (!confirm(`${name} さんを「未受取」に戻します。よろしいですか？`)) {
             return;
         }
 
         const userInput = prompt("受取を戻すには管理用パスワードを入力してください：");
-        if (userInput === null) return; // キャンセル時
+        if (userInput === null) return;
 
         if (userInput !== savedPassword) {
             alert("パスワードが違います。変更できません。");
             return;
         }
     } else {
-        // ❌から⭕（未受取から受取済にする）時は確認のみでパスワードは不要
-        if (!confirm(`${name} さんを「受取済」にします。よろしいですか？`)) {
-            return;
-        }
+        // 未受取から受取は確認なし一発切り替え
     }
     
     history[historyIndex].participants[participantIndex].received = !currentStatus;
@@ -677,7 +927,6 @@ function toggleReceived(historyIndex, participantIndex) {
     drawHistory();
 }
 
-// 誤削除防止のため削除には一律パスワード
 function deleteHistory(index){
     const savedPassword = localStorage.getItem("adminPassword");
     
