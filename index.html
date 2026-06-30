@@ -175,14 +175,13 @@ button.gray{
 .badge-part { background: #ffe082; color: #b78103; }
 .badge-done { background: #c8e6c9; color: #2e7d32; }
 
-/* 未受取キャラバッジエリア（右寄せ用） */
+/* 未受取キャラバッジエリア（2行目・左寄せ用） */
 .unreceived-badges-wrapper {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    margin-left: auto; /* 左側に自動でマージンを取ることで右寄せ */
-    padding-left: 15px; /* アイテム名やステータスとの間の最低限の余白 */
-    padding-right: 15px; /* 詳細ボタンとの間の余白 */
+    margin-top: 6px; /* 1行目との間隔 */
+    width: 100%;
 }
 
 /* 未受取キャラバッジ */
@@ -207,8 +206,8 @@ button.gray{
     background: white;
     cursor: pointer;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column; /* 縦並び（2行構成）にする */
+    align-items: flex-start;
     user-select: none;
 }
 .accordion-header * {
@@ -219,7 +218,7 @@ button.gray{
     align-items: center;
     flex-wrap: wrap;
     gap: 5px;
-    flex: 1; /* タイトルブロックを可能な限り広げる */
+    flex: 1;
 }
 .accordion-content {
     display: none;
@@ -357,6 +356,11 @@ button.gray{
 <div id="list" class="page active">
     <div class="card">
         <h2>分配一覧 <span style="font-size:12px; color:#666; font-weight:normal;">(タップで詳細を開閉 / 名前タップで一括管理)</span></h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 10px;">
+            <button class="gray" onclick="sortHistory('date')" style="padding: 8px; font-size: 12px;">日付順</button>
+            <button class="gray" onclick="sortHistory('item')" style="padding: 8px; font-size: 12px;">名前順</button>
+            <button class="gray" onclick="sortHistory('status')" style="padding: 8px; font-size: 12px;">未分配優先</button>
+        </div>
         <div id="history"></div>
     </div>
 </div>
@@ -416,7 +420,6 @@ button.gray{
     </div>
 </div>
 
-<!-- 未受取一括管理モーダル（別窓） -->
 <div id="unreceivedModal" class="modal-overlay" onclick="closeModal()">
     <div class="modal-window" onclick="event.stopPropagation()">
         <div class="modal-header">
@@ -491,18 +494,36 @@ let defaultHistory = [
     { date: "2026-06-14", item: "蘇生ブーツ", price: null, count: 7, onePrice: null, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "ルリリ", received: false }, { name: "らむえる", received: false }, { name: "白岳", received: false }, { name: "evergarden", received: false }, { name: "シュウマィ", received: false }] }
 ];
 
-// 初期設定（強制上書きでデータを入れ直します）
-localStorage.setItem("members", JSON.stringify(defaultMembers));
-localStorage.setItem("history", JSON.stringify(defaultHistory));
-
-if (!localStorage.getItem("adminPassword")) {
-    localStorage.setItem("adminPassword", "1234");
-}
+if(!localStorage.getItem("history")) localStorage.setItem("history", JSON.stringify(defaultHistory));
+if(!localStorage.getItem("members")) localStorage.setItem("members", JSON.stringify(defaultMembers));
+if(!localStorage.getItem("adminPassword")) localStorage.setItem("adminPassword", "1234");
 
 let members = JSON.parse(localStorage.getItem("members"));
 let history = JSON.parse(localStorage.getItem("history"));
 let editingIndex = null;
 let openIndexes = {}; 
+
+function sortHistory(key) {
+    if (key === 'date') {
+        history.sort((a, b) => new Date(b.date) - new Date(a.date));
+    } else if (key === 'item') {
+        history.sort((a, b) => a.item.localeCompare(b.item, 'ja'));
+    } else if (key === 'status') {
+        // ステータス優先：未分配(0) > 一部(1) > 完了(2)
+        history.sort((a, b) => getStatusScore(a) - getStatusScore(b));
+    }
+    openIndexes = {};
+    saveLocal();
+    drawHistory();
+}
+
+function getStatusScore(h) {
+    const doneCount = h.participants.filter(p => p.received).length;
+    const total = h.participants.length;
+    if (doneCount === 0) return 0; // 未分配
+    if (doneCount < total) return 1; // 一部済
+    return 2; // 完了
+}
 
 function showPage(id, obj){
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
@@ -734,7 +755,6 @@ function drawHistory(){
         if (unreceivedMembers.length > 0 && doneCount < total) {
             unreceivedBadgesHtml += `<div class="unreceived-badges-wrapper">`;
             unreceivedMembers.forEach(p => {
-                // バッジクリック時に親要素のアコーディオン開閉を発火させないため stopPropagation()
                 unreceivedBadgesHtml += `<span class="unreceived-name-badge" onclick="event.stopPropagation(); openUnreceivedSummary('${p.name}')">${p.name}</span>`;
             });
             unreceivedBadgesHtml += `</div>`;
@@ -780,15 +800,18 @@ function drawHistory(){
         area.innerHTML += `
         <div class="${openClass}">
             <div class="accordion-header" onclick="toggleAccordion(${index})">
-                <div class="accordion-title-block">
-                    <span class="small" style="color:#777;">${h.date}</span>
-                    <strong style="font-size:15px; margin-left:5px;">${h.item}</strong>
-                    ${badge}
+                <div class="flex-between" style="width: 100%;">
+                    <div class="accordion-title-block">
+                        <span class="small" style="color:#777;">${h.date}</span>
+                        <strong style="font-size:15px; margin-left:5px;">${h.item}</strong>
+                        ${badge}
+                    </div>
+                    <div>
+                        <span style="font-size:12px; color:#1976d2; font-weight:bold;">${arrow}</span>
+                    </div>
                 </div>
+                
                 ${unreceivedBadgesHtml}
-                <div>
-                    <span style="font-size:12px; color:#1976d2; font-weight:bold;">${arrow}</span>
-                </div>
             </div>
             
             <div class="accordion-content">
@@ -826,7 +849,6 @@ function openUnreceivedSummary(memberName) {
     let matchCount = 0;
 
     history.forEach((h, hIdx) => {
-        // 対象キャラがその分配に参加しており、かつ未受取であるか判定
         const pState = h.participants.find(p => p.name === memberName && !p.received);
         if (pState) {
             matchCount++;
@@ -855,7 +877,6 @@ function openUnreceivedSummary(memberName) {
         
         const bulkBtn = document.getElementById("modalBulkBtn");
         bulkBtn.style.display = "block";
-        // ボタンに処理を仕込む（引数で名前を渡す）
         bulkBtn.onclick = function() {
             bulkReceiveAction(memberName);
         };
@@ -864,12 +885,10 @@ function openUnreceivedSummary(memberName) {
     document.getElementById("unreceivedModal").classList.add("active");
 }
 
-// 別窓を閉じる
 function closeModal() {
     document.getElementById("unreceivedModal").classList.remove("active");
 }
 
-// 一括受取処理アクション
 function bulkReceiveAction(memberName) {
     const savedPassword = localStorage.getItem("adminPassword");
     
@@ -885,7 +904,6 @@ function bulkReceiveAction(memberName) {
         return;
     }
 
-    // 全履歴をループして対象キャラのステータスを書き換え
     history.forEach((h) => {
         h.participants.forEach((p) => {
             if (p.name === memberName && !p.received) {
@@ -900,7 +918,6 @@ function bulkReceiveAction(memberName) {
     alert(`${memberName} さんの未受取アイテムを一括受取済にしました。`);
 }
 
-// 受取フラグ変更処理
 function toggleReceived(historyIndex, participantIndex) {
     const currentStatus = history[historyIndex].participants[participantIndex].received;
     const name = history[historyIndex].participants[participantIndex].name;
@@ -919,7 +936,6 @@ function toggleReceived(historyIndex, participantIndex) {
             return;
         }
     } else {
-        // 未受取から受取は確認なし一発切り替え
     }
     
     history[historyIndex].participants[participantIndex].received = !currentStatus;
