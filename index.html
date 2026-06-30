@@ -323,7 +323,7 @@ let defaultMembers = [
     "忍穂", "つねやす", "ルージュラ", "飛呂斗"
 ];
 
-// 【復活・完全版】全44件の初期データを日付が古い順にソートして配置
+// 初期データ全44件
 let defaultHistory = [
     { date: "2023-10-10", item: "ファイアーストーム", price: null, count: 4, onePrice: null, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "らむえる", received: false }, { name: "シュウマィ", received: false }] },
     { date: "2023-11-05", item: "ドラゴンの心臓", price: 10000000, count: 5, onePrice: 2000000, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "らむえる", received: true }, { name: "シュウマィ", received: true }, { name: "つねやす", received: false }] },
@@ -371,12 +371,8 @@ let defaultHistory = [
     { date: "2026-06-14", item: "蘇生ブーツ", price: null, count: 7, onePrice: null, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "ルリリ", received: false }, { name: "らむえる", received: false }, { name: "白岳", received: false }, { name: "evergarden", received: false }, { name: "シュウマィ", received: false }] }
 ];
 
-// 初期設定
-if (!localStorage.getItem("members")) {
-    localStorage.setItem("members", JSON.stringify(defaultMembers));
-}
-
-// データの欠落対策として、配列の長さに関わらず新しい履歴データを強制適用（上書き）します
+// 初期設定（強制上書きでデータを入れ直します）
+localStorage.setItem("members", JSON.stringify(defaultMembers));
 localStorage.setItem("history", JSON.stringify(defaultHistory));
 
 if (!localStorage.getItem("adminPassword")) {
@@ -551,63 +547,129 @@ function saveHistory(){
     showPage('list', document.getElementById('nav-list'));
 }
 
-function toggleAccordion(index) {
-    openIndexes[index] = !openIndexes[index];
-    drawHistory();
-}
+// 【完全復活】分配一覧の描画処理本体
+function drawHistory(){
+    const area = document.getElementById("history");
+    area.innerHTML = "";
 
-function startEdit(index) {
-    editingIndex = index;
-    drawHistory();
-}
-
-function cancelEdit() {
-    editingIndex = null;
-    drawHistory();
-}
-
-function updateHistory(index) {
-    const editItem = document.getElementById(`editItem-${index}`).value.trim();
-    const editPriceInput = document.getElementById(`editPrice-${index}`).value;
-    
-    if(editItem == "" || (editPriceInput !== "" && Number(editPriceInput) < 0)) {
-        alert("正しく入力してください");
+    if(history.length === 0){
+        area.innerHTML = "<div class='small'>履歴がありません</div>";
         return;
     }
 
-    const currentData = history[index];
-    const price = editPriceInput === "" ? null : Number(editPriceInput);
-    const onePrice = price === null ? null : Math.floor(price / currentData.count);
+    history.forEach((h, index) => {
+        const isOpen = openIndexes[index];
+        const isEditing = (editingIndex === index);
 
-    history[index].item = editItem;
-    history[index].price = price;
-    history[index].onePrice = onePrice;
+        // 各受取状況カウント
+        const total = h.participants.length;
+        const doneCount = h.participants.filter(p => p.received).length;
 
-    saveLocal();
-    editingIndex = null;
-    drawHistory();
-    alert("変更を保存しました");
+        let badge = `<span class="status-badge badge-unpaid">未分配</span>`;
+        if (doneCount > 0 && doneCount < total) {
+            badge = `<span class="status-badge badge-part">一部済 (${doneCount}/${total})</span>`;
+        } else if (doneCount === total) {
+            badge = `<span class="status-badge badge-done">分配完了 🎉</span>`;
+        }
+
+        const priceDisplay = h.price === null ? "未売却" : h.price.toLocaleString() + " A";
+        const onePriceDisplay = h.onePrice === null ? "--- A" : h.onePrice.toLocaleString() + " A";
+
+        if (isEditing) {
+            // 編集モードの見た目
+            area.innerHTML += `
+            <div class="listItem" style="padding:15px;">
+                <div class="edit-form-box">
+                    <label>アイテム名</label>
+                    <input type="text" id="editItem-${index}" value="${h.item}">
+                    <label>総売却価格 (空欄で未売却)</label>
+                    <input type="number" id="editPrice-${index}" value="${h.price === null ? '' : h.price}">
+                    <div style="margin-top:10px; display:flex; gap:10px;">
+                        <button class="green" onclick="updateHistory(${index})">保存</button>
+                        <button class="gray" onclick="cancelEdit()">キャンセル</button>
+                    </div>
+                </div>
+            </div>
+            `;
+            return;
+        }
+
+        // 通常表示（アコーディオン）
+        let receiverButtons = "";
+        h.participants.forEach((p, pIdx) => {
+            const btnClass = p.received ? "receiver-btn received" : "receiver-btn";
+            const mark = p.received ? "⭕" : "❌";
+            receiverButtons += `
+                <div class="${btnClass}" onclick="toggleReceived(${index}, ${pIdx})">
+                    ${p.name} [${mark}]
+                </div>
+            `;
+        });
+
+        const arrow = isOpen ? "▲ 閉じる" : "▼ 詳細";
+        const openClass = isOpen ? "listItem open" : "listItem";
+
+        area.innerHTML += `
+        <div class="${openClass}">
+            <div class="accordion-header" onclick="toggleAccordion(${index})">
+                <div class="accordion-title-block">
+                    <span class="small" style="color:#777;">${h.date}</span>
+                    <strong style="font-size:15px; margin-left:5px;">${h.item}</strong>
+                    ${badge}
+                </div>
+                <div>
+                    <span style="font-size:12px; color:#1976d2; font-weight:bold;">${arrow}</span>
+                </div>
+            </div>
+            
+            <div class="accordion-content">
+                <div style="line-height:1.7; margin-bottom:12px; color:#444;">
+                    💰 <b>総額:</b> ${priceDisplay}<br>
+                    👥 <b>人数:</b> ${h.count} 人<br>
+                    💎 <b style="font-size:15px; color:#1976d2;">一人当たり: ${onePriceDisplay}</b>
+                </div>
+                
+                <div style="border-top:1px dashed #ddd; padding-top:10px; margin-bottom:15px;">
+                    <span class="small" style=\"font-weight:bold; color:#555;\">受取状況 (名札タップで切替):</span>
+                    <div class="receiver-list">
+                        ${receiverButtons}
+                    </div>
+                </div>
+
+                <div class="flex-between" style="border-top:1px solid #eee; padding-top:10px;">
+                    <button class="gray" style="padding:6px 14px; font-size:13px;" onclick="startEdit(${index})">再編集 ✏️</button>
+                    <button class="red" onclick="deleteHistory(${index})">削除</button>
+                </div>
+            </div>
+        </div>
+        `;
+    });
 }
 
+// 受取フラグ変更処理（受取を戻す[⭕→❌]時だけパスワードを要求する）
 function toggleReceived(historyIndex, participantIndex) {
     const currentStatus = history[historyIndex].participants[participantIndex].received;
     const name = history[historyIndex].participants[participantIndex].name;
     const savedPassword = localStorage.getItem("adminPassword");
 
-    let confirmMsg = currentStatus 
-        ? `${name} さんを「未受取」に戻します。よろしいですか？`
-        : `${name} さんを「受取済」にします。よろしいですか？`;
+    if (currentStatus === true) {
+        // ⭕から❌（受取を戻す）時だけパスワードを必要にする
+        if (!confirm(`${name} さんを「未受取」に戻します。よろしいですか？`)) {
+            return;
+        }
 
-    if (!confirm(confirmMsg)) {
-        return;
-    }
+        const userInput = prompt("受取を戻すには管理用パスワードを入力してください：");
+        if (userInput === null) return; // キャンセル時
 
-    const userInput = prompt("管理用パスワードを入力してください：");
-    if (userInput === null) return;
-
-    if (userInput !== savedPassword) {
-        alert("パスワードが違います。変更できません。");
-        return;
+        if (userInput !== savedPassword) {
+            alert("パスワードが違います。変更できません。");
+            return;
+        }
+    } else {
+        // ❌から⭕（未受取から受取済にする）時は確認のみでパスワードは不要
+        if (!confirm(`${name} さんを「受取済」にします。よろしいですか？`)) {
+            return;
+        }
     }
     
     history[historyIndex].participants[participantIndex].received = !currentStatus;
@@ -615,6 +677,7 @@ function toggleReceived(historyIndex, participantIndex) {
     drawHistory();
 }
 
+// 誤削除防止のため削除には一律パスワード
 function deleteHistory(index){
     const savedPassword = localStorage.getItem("adminPassword");
     
