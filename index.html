@@ -93,9 +93,10 @@ button.red{
     background:#e53935;
     color:white;
     border:none;
-    padding:8px 15px;
+    padding:6px 12px;
     border-radius:6px;
     cursor:pointer;
+    font-size: 13px;
 }
 button.green{
     background:#4caf50;
@@ -116,9 +117,9 @@ button.gray{
 .listItem{
     background:white;
     border-radius:10px;
-    padding:15px;
     margin-bottom:10px;
     box-shadow:0 1px 4px rgba(0,0,0,.15);
+    overflow: hidden;
 }
 .small{
     color:#666;
@@ -164,28 +165,46 @@ button.gray{
 .status-badge {
     padding: 2px 6px;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: bold;
     margin-left: 5px;
+    white-space: nowrap;
 }
 .badge-unpaid { background: #e0e0e0; color: #666; }
 .badge-part { background: #ffe082; color: #b78103; }
 .badge-done { background: #c8e6c9; color: #2e7d32; }
 
-.editable-title {
+/* アコーディオン（開閉親パーツ） */
+.accordion-header {
+    padding: 15px;
+    background: white;
     cursor: pointer;
-    border-bottom: 1px dashed #1976d2;
-    display: inline-block;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
 }
-.editable-title:hover {
-    background: #f0f7ff;
+.accordion-header:hover {
+    background: #fcfdfe;
 }
-.edit-form-box {
-    background: #f9f9f9;
-    padding: 10px;
-    border-radius: 8px;
-    margin-top: 10px;
-    border: 1px solid #1976d2;
+.accordion-title-block {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+.accordion-content {
+    display: none; /* 通常は閉じておく */
+    padding: 15px;
+    background: #fafafa;
+    border-top: 1px dashed #eee;
+}
+/* 展開中クラス */
+.listItem.open .accordion-content {
+    display: block;
+}
+.listItem.open .accordion-header {
+    background: #f5f9ff;
 }
 
 /* 受取人チェックボタンのスタイル */
@@ -212,6 +231,13 @@ button.gray{
     color: #2e7d32;
     font-weight: bold;
 }
+.edit-form-box {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #1976d2;
+}
 </style>
 </head>
 <body>
@@ -228,7 +254,7 @@ button.gray{
 
 <div id="list" class="page active">
     <div class="card">
-        <h2>分配一覧 <span style="font-size:12px; color:#666; font-weight:normal;">(名札タップで受取切替)</span></h2>
+        <h2>分配一覧 <span style="font-size:12px; color:#666; font-weight:normal;">(タップで詳細を開閉)</span></h2>
         <div id="history"></div>
     </div>
 </div>
@@ -276,6 +302,7 @@ button.gray{
 let members = JSON.parse(localStorage.getItem("members") || "[]");
 let history = JSON.parse(localStorage.getItem("history") || "[]");
 let editingIndex = null;
+let openIndexes = {}; // どの窓が開いているかを記録するオブジェクト
 
 function showPage(id, obj){
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
@@ -321,7 +348,7 @@ function drawMembers(){
     }
     members.forEach((name, index) => {
         list.innerHTML += `
-        <div class="listItem flex-between">
+        <div class="listItem flex-between" style="padding:15px;">
             <b>${name}</b>
             <button class="red" onclick="deleteMember(${index})">削除</button>
         </div>
@@ -412,6 +439,12 @@ function saveHistory(){
     showPage('list', document.getElementById('nav-list'));
 }
 
+// 窓を開閉するトグル関数
+function toggleAccordion(index) {
+    openIndexes[index] = !openIndexes[index];
+    drawHistory();
+}
+
 function startEdit(index) {
     editingIndex = index;
     drawHistory();
@@ -445,7 +478,6 @@ function updateHistory(index) {
     alert("変更を保存しました");
 }
 
-// 受取ステータスを切り替える（チェックを外す時だけ確認を追加）
 function toggleReceived(historyIndex, participantIndex) {
     if (typeof history[historyIndex].participants[participantIndex] === 'string') {
         return; 
@@ -454,14 +486,12 @@ function toggleReceived(historyIndex, participantIndex) {
     const currentStatus = history[historyIndex].participants[participantIndex].received;
     const name = history[historyIndex].participants[participantIndex].name;
 
-    // すでに受取済（true）のとき＝チェックを外すときは確認を出す
     if (currentStatus === true) {
         if (!confirm(`${name} さんを「未受取」に戻してもよろしいですか？`)) {
-            return; // キャンセルされたら何もしない
+            return;
         }
     }
     
-    // 反転させて保存
     history[historyIndex].participants[participantIndex].received = !currentStatus;
     saveLocal();
     drawHistory();
@@ -483,11 +513,12 @@ function drawHistory(){
 
         const receivedCount = h.participants.filter(p => p.received).length;
         
+        // 1. 編集モード中のフォーム表示
         if (editingIndex === index) {
             const namesStr = h.participants.map(p => p.name).join(", ");
             area.innerHTML += `
-            <div class="listItem edit-form-box">
-                <label style="margin-top:0;">アイテム名編集</label>
+            <div class="edit-form-box">
+                <label style="margin-top:0; color:#1976d2;">📝 アイテムの編集</label>
                 <input type="text" id="editItem-${index}" value="${h.item}">
                 <label>総売却価格 (A) ※未売却なら空欄</label>
                 <input type="number" id="editPrice-${index}" value="${h.price !== null ? h.price : ''}">
@@ -501,63 +532,83 @@ function drawHistory(){
                 </div>
             </div>
             `;
-        } else {
-            let priceDisplay = "未売却 (--- A)";
-            let onePriceDisplay = "--- A";
-            let statusBadge = "";
-            
-            if (h.price === null || h.price === undefined) {
-                statusBadge = `<span class="status-badge badge-unpaid">未売却</span>`;
-            } else if (receivedCount === h.count) {
-                priceDisplay = `${h.price.toLocaleString()} A`;
-                onePriceDisplay = `${h.onePrice.toLocaleString()} A`;
-                statusBadge = `<span class="status-badge badge-done">分配完了 🎉</span>`;
-            } else {
-                priceDisplay = `${h.price.toLocaleString()} A`;
-                onePriceDisplay = `${h.onePrice.toLocaleString()} A`;
-                statusBadge = `<span class="status-badge badge-part">分配中 (${receivedCount}/${h.count})</span>`;
-            }
+            return;
+        }
 
-            let receiverButtons = "";
-            h.participants.forEach((p, pIdx) => {
-                const activeClass = p.received ? "received" : "";
-                const icon = p.received ? "⭕ " : "❌ ";
-                receiverButtons += `
-                    <span class="receiver-btn ${activeClass}" onclick="toggleReceived(${index}, ${pIdx})">
-                        ${icon}${p.name}
-                    </span>
-                `;
-            });
-            
-            area.innerHTML += `
-            <div class="listItem">
-                <div class="flex-between">
-                    <b class="editable-title" style="color:#1976d2; font-size:18px;" onclick="startEdit(${index})">
-                        ${h.item}${statusBadge} ✏️
-                    </b>
-                    <button class="red" style="padding:4px 8px; font-size:12px;" onclick="deleteHistory(${index})">削除</button>
+        // --- 通常モード（開閉アコーディオン）の処理 ---
+        let priceDisplay = "未売却 (--- A)";
+        let onePriceDisplay = "--- A";
+        let statusBadge = "";
+        
+        if (h.price === null || h.price === undefined) {
+            statusBadge = `<span class="status-badge badge-unpaid">未売却</span>`;
+        } else if (receivedCount === h.count) {
+            priceDisplay = `${h.price.toLocaleString()} A`;
+            onePriceDisplay = `${h.onePrice.toLocaleString()} A`;
+            statusBadge = `<span class="status-badge badge-done">完了 🎉</span>`;
+        } else {
+            priceDisplay = `${h.price.toLocaleString()} A`;
+            onePriceDisplay = `${h.onePrice.toLocaleString()} A`;
+            statusBadge = `<span class="status-badge badge-part">分配中 (${receivedCount}/${h.count})</span>`;
+        }
+
+        let receiverButtons = "";
+        h.participants.forEach((p, pIdx) => {
+            const activeClass = p.received ? "received" : "";
+            const icon = p.received ? "⭕ " : "❌ ";
+            receiverButtons += `
+                <span class="receiver-btn ${activeClass}" onclick="toggleReceived(${index}, ${pIdx})">
+                    ${icon}${p.name}
+                </span>
+            `;
+        });
+
+        // 窓が開いているかどうか
+        const isOpen = openIndexes[index] ? "open" : "";
+        const arrow = openIndexes[index] ? "▲" : "▼";
+        
+        area.innerHTML += `
+        <div class="listItem ${isOpen}">
+            <div class="accordion-header" onclick="toggleAccordion(${index})">
+                <div class="accordion-title-block">
+                    <b style="color:#222; font-size:16px;">${h.item}</b>
+                    ${statusBadge}
                 </div>
-                <div style="margin-top:10px; line-height:1.6;">
-                    <span class="small" onclick="startEdit(${index})">📅 ${h.date}</span><br>
-                    <span onclick="startEdit(${index})">💰 総額：${priceDisplay}</span><br>
-                    <span onclick="startEdit(${index})">👥 人数：${h.count} 人</span><br>
-                    <span onclick="startEdit(${index})">💎 <b>一人当たり：${onePriceDisplay}</b></span><br>
-                    <div style="margin-top:8px; padding-top:8px; border-top:1px dashed #eee;">
-                        <span class="small" style="font-weight:bold; color:#555;">受取状況:</span>
-                        <div class="receiver-list">
-                            ${receiverButtons}
-                        </div>
-                    </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span class="small" style="color:#888;">${h.date}</span>
+                    <span style="font-size:12px; color:#aaa;">${arrow}</span>
                 </div>
             </div>
-            `;
-        }
+            
+            <div class="accordion-content">
+                <div style="line-height:1.7; margin-bottom:12px; color:#444;">
+                    💰 <b>総額:</b> ${priceDisplay}<br>
+                    👥 <b>人数:</b> ${h.count} 人<br>
+                    💎 <b style="font-size:15px; color:#1976d2;">一人当たり: ${onePriceDisplay}</b>
+                </div>
+                
+                <div style="border-top:1px dashed #ddd; padding-top:10px; margin-bottom:15px;">
+                    <span class="small" style="font-weight:bold; color:#555;">受取状況 (名札タップで切替):</span>
+                    <div class="receiver-list">
+                        ${receiverButtons}
+                    </div>
+                </div>
+
+                <div class="flex-between" style="border-top:1px solid #eee; padding-top:10px;">
+                    <button class="gray" style="padding:6px 14px; font-size:13px;" onclick="startEdit(${index})">再編集 ✏️</button>
+                    <button class="red" onclick="deleteHistory(${index})">削除</button>
+                </div>
+            </div>
+        </div>
+        `;
     });
 }
 
 function deleteHistory(index){
     if(!confirm("この履歴を削除しますか？")) return;
     history.splice(index, 1);
+    // 開閉状態もリセット
+    delete openIndexes[index];
     saveLocal();
     drawHistory();
 }
