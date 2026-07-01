@@ -422,6 +422,7 @@ button.gray{
 <button id="nav-member" onclick="showPage('member',this)">キャラ登録</button>
 <button id="nav-new" onclick="showPage('new',this)">新規登録</button>
 <button id="nav-config" onclick="showPage('config',this)">設定 ⚙️</button>
+<button id="nav-save" onclick="saveToCloudTab()" style="background: #e3f2fd; color: #1976d2; font-weight: bold;">保存 💾</button>
 </nav>
 
 <div id="list" class="page active">
@@ -523,11 +524,50 @@ function showLoading(show) {
     document.getElementById("loading-overlay").style.display = show ? "flex" : "none";
 }
 
+// ローカル（ブラウザの記憶領域）に状態を仮保存する関数
+function saveToLocalStorage() {
+    localStorage.setItem("members", JSON.stringify(members));
+    localStorage.setItem("history", JSON.stringify(history));
+    localStorage.setItem("adminPassword", adminPassword);
+}
+
+// ⬇️ 「保存」タブをタップしたときに実行される手動通信関数
+async function saveToCloudTab() {
+    if(!GAS_URL || GAS_URL.startsWith("https://script.google.com/macros/s/AKfycb...")) {
+        alert("GASのURLが設定されていません。");
+        return;
+    }
+    if(!confirm("現在の変更内容（キャラクター、履歴、受取状況など）をすべてスプレッドシート（クラウド）に保存しますか？")) return;
+    
+    showLoading(true);
+    try {
+        const dataToSend = {
+            members: members,
+            history: history,
+            adminPassword: adminPassword
+        };
+        const res = await fetch(GAS_URL, {
+            method: "POST",
+            body: JSON.stringify(dataToSend)
+        });
+        const result = await res.json();
+        if(result.status === "success") {
+            alert("クラウドへの保存が完了しました！ ✨");
+        } else {
+            alert("保存に失敗しました: " + (result.message || "不明なエラー"));
+        }
+    } catch (err) {
+        alert("通信エラーが発生しました。保存できませんでした。");
+        console.error(err);
+    } finally {
+        showLoading(false);
+    }
+}
+
 // ⬇️ スマホに残っている初期データを強制的にクラウドに送信する関数
 async function forceUploadLocalToCloud() {
     if(!confirm("現在画面に出ているデータをスプレッドシート（クラウド）へ上書きアップロードします。よろしいですか？")) return;
     
-    // スマホのローカルストレージからデータを吸い上げる
     try {
         const localM = localStorage.getItem("members");
         const localH = localStorage.getItem("history");
@@ -556,13 +596,12 @@ async function forceUploadLocalToCloud() {
         if(result.status === "success") {
             alert("クラウドへの初期データ移行が完了しました！これ以降は全員でリアルタイムに共有されます。");
             document.getElementById("migration-box").style.display = "none";
-            // 完了後はクラウドから最新を取得して再描画
             await loadFromCloud();
         } else {
             alert("移行に失敗しました: " + result.message);
         }
     } catch (err) {
-        alert("通信エラーが発生しました。GASのURLやデプロイ設定（全員になっているか）を確認してください。");
+        alert("通信エラーが発生しました。GASのURLやデプロイ設定を確認してください。");
         console.error(err);
     } finally {
         showLoading(false);
@@ -571,7 +610,7 @@ async function forceUploadLocalToCloud() {
 
 // クラウド（スプレッドシート）からデータを読み込む関数
 async function loadFromCloud() {
-    if(!GAS_URL || GAS_URL.startsWith("ここに")) {
+    if(!GAS_URL || GAS_URL.startsWith("https://script.google.com/macros/s/AKfycb...")) {
         alert("GASのURLが設定されていません。コード内の GAS_URL を書き換えてください。");
         return;
     }
@@ -580,32 +619,28 @@ async function loadFromCloud() {
         const response = await fetch(GAS_URL);
         const data = await response.json();
         
-        // クラウド側が完全空っぽ（初期状態）かつローカルにデータがある場合
         const localM = localStorage.getItem("members");
         const hasLocalData = localM && JSON.parse(localM).length > 0;
         
         if ((!data.members || data.members.length === 0) && hasLocalData) {
-            // オレンジ色の移行案内を表示する
             document.getElementById("migration-box").style.display = "block";
             
-            // クラウドから読めない間は一旦スマホのデータを表示しておく
             members = JSON.parse(localStorage.getItem("members")) || [];
             history = JSON.parse(localStorage.getItem("history")) || [];
             adminPassword = localStorage.getItem("adminPassword") || "1234";
         } else {
-            // 通常通りクラウドから読み込む
             document.getElementById("migration-box").style.display = "none";
             members = data.members || [];
             history = data.history || [];
             adminPassword = data.adminPassword || "1234";
+            saveToLocalStorage(); // クラウドから取得した最新状態をローカルにも同期
         }
         
         drawMembers();
         updateSortButtonUI();
         drawHistory();
     } catch (err) {
-        console.error("クラウド読み込みエラー。ローカルデータを仮表示します:", err);
-        // 通信が失敗した場合は、ローカルデータを表示して移行ボタンを出す
+        console.error("クラウド読み込みエラー。ローカルデータを表示します:", err);
         document.getElementById("migration-box").style.display = "block";
         members = JSON.parse(localStorage.getItem("members")) || [];
         history = JSON.parse(localStorage.getItem("history")) || [];
@@ -614,27 +649,6 @@ async function loadFromCloud() {
         drawMembers();
         updateSortButtonUI();
         drawHistory();
-    } finally {
-        showLoading(false);
-    }
-}
-
-async function saveToCloud() {
-    if(!GAS_URL || GAS_URL.startsWith("ここに")) return;
-    showLoading(true);
-    try {
-        const dataToSend = {
-            members: members,
-            history: history,
-            adminPassword: adminPassword
-        };
-        await fetch(GAS_URL, {
-            method: "POST",
-            body: JSON.stringify(dataToSend)
-        });
-    } catch (err) {
-        alert("クラウドへの保存に失敗しました。通信環境を確認してください。");
-        console.error(err);
     } finally {
         showLoading(false);
     }
@@ -725,8 +739,8 @@ async function changePassword(){
     }
 
     adminPassword = newInput;
-    await saveToCloud();
-    alert("パスワードを変更しました！");
+    saveToLocalStorage(); // 自動通信はせずローカル保存のみ
+    alert("パスワードを変更しました！（スプレッドシートへ反映するには右上『保存』タブを押してください）");
     
     document.getElementById("currentPassword").value = "";
     document.getElementById("newPassword").value = "";
@@ -744,7 +758,7 @@ async function addMember(event){
     }
     members.push(name);
     document.getElementById("memberName").value = "";
-    await saveToCloud();
+    saveToLocalStorage(); // 自動通信はせずローカル保存のみ
     drawMembers();
 }
 
@@ -768,7 +782,7 @@ function drawMembers(){
 async function deleteMember(index){
     if(!confirm("削除してもよろしいですか？")) return;
     members.splice(index, 1);
-    await saveToCloud();
+    saveToLocalStorage(); // 自動通信はせずローカル保存のみ
     drawMembers();
 }
 
@@ -838,14 +852,14 @@ async function saveHistory(){
         onePrice: onePrice
     });
 
-    await saveToCloud();
+    saveToLocalStorage(); // 自動通信はせずローカル保存のみ
     drawHistory();
 
     document.getElementById("item").value = "";
     document.getElementById("price").value = "";
     document.getElementById("date").valueAsDate = new Date();
 
-    alert("保存しました！");
+    alert("保存しました！（スプレッドシートへ反映するには右上『保存』タブを押してください）");
     showPage('list', document.getElementById('nav-list'));
 }
 
@@ -881,10 +895,10 @@ async function updateHistory(index) {
     history[index].price = price;
     history[index].onePrice = onePrice;
 
-    await saveToCloud();
+    saveToLocalStorage(); // 自動通信はせずローカル保存のみ
     editingIndex = null;
     drawHistory();
-    alert("変更を保存しました");
+    alert("変更を仮保存しました。右上『保存』タブから同期してください。");
 }
 
 function drawHistory(){
@@ -1084,7 +1098,7 @@ async function handleReceiverPress(historyIndex, participantIndex, forceSelectDa
         history[historyIndex].participants[participantIndex].receivedDate = receiveDate;
     }
     
-    await saveToCloud();
+    saveToLocalStorage(); // 自動通信はせずローカル保存のみ
     drawHistory();
 }
 
@@ -1156,7 +1170,7 @@ async function bulkReceiveAction(memberName) {
         });
     });
 
-    await saveToCloud();
+    saveToLocalStorage(); // 自動通信はせずローカル保存のみ
     drawHistory();
     closeModal();
     alert(`${memberName} さんの未受取アイテムを一括受取済にしました。`);
@@ -1172,7 +1186,7 @@ async function deleteHistory(index){
     }
     history.splice(index, 1);
     delete openIndexes[index];
-    await saveToCloud();
+    saveToLocalStorage(); // 自動通信はせずローカル保存のみ
     drawHistory();
     alert("削除しました。");
 }
