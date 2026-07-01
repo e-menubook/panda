@@ -285,6 +285,13 @@ button.gray{
     transition: all 0.2s;
     user-select: none;
 }
+/* 個別の未受取（一括バッジの薄赤とは異なる、薄オレンジ系に設定） */
+.receiver-btn.unreceived {
+    background: #fff3e0;
+    border-color: #ffb74d;
+    color: #e65100;
+}
+/* 個別の受取済 */
 .receiver-btn.received {
     background: #e8f5e9;
     border-color: #81c784;
@@ -855,7 +862,7 @@ function drawHistory(){
 
         let receiverButtons = "";
         h.participants.forEach((p, pIdx) => {
-            const btnClass = p.received ? "receiver-btn received" : "receiver-btn";
+            const btnClass = p.received ? "receiver-btn received" : "receiver-btn unreceived";
             const mark = p.received ? "⭕" : "❌";
             const dateDisplay = p.received && p.receivedDate ? `<br><span style="font-size: 11px; font-weight: normal; color: #555; opacity: 0.85;">${p.receivedDate}</span>` : "";
             
