@@ -1,0 +1,1508 @@
+{
+  "members": [
+    "みゅうたん",
+    "ネット",
+    "ルリリ",
+    "らむえる",
+    "白岳",
+    "Rinfone",
+    "evergarden",
+    "あいあーる",
+    "シュウマィ",
+    "忍穂",
+    "つねやす",
+    "ルージュラ",
+    "飛呂斗"
+  ],
+  "history": [
+    {
+      "date": "2023-10-10",
+      "item": "ファイアーストーム",
+      "price": null,
+      "count": 4,
+      "onePrice": null,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "らむえる",
+          "received": false
+        },
+        {
+          "name": "シュウマィ",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2023-11-05",
+      "item": "ドラゴンの心臓",
+      "price": 10000000,
+      "count": 5,
+      "onePrice": 2000000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "シュウマィ",
+          "received": true
+        },
+        {
+          "name": "つねやす",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2024-01-30",
+      "item": "変コン",
+      "price": null,
+      "count": 5,
+      "onePrice": null,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false,
+          "receivedDate": null
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "らむえる",
+          "received": false,
+          "receivedDate": null
+        },
+        {
+          "name": "あいあーる",
+          "received": false,
+          "receivedDate": null
+        },
+        {
+          "name": "つねやす",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2024-02-04",
+      "item": "傲慢アミュ４階（蘇生",
+      "price": 500000,
+      "count": 5,
+      "onePrice": 100000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "あいあーる",
+          "received": true
+        },
+        {
+          "name": "飛呂斗",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2024-02-08",
+      "item": "DKヘルム",
+      "price": 5000000,
+      "count": 6,
+      "onePrice": 833333,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "あいあーる",
+          "received": true
+        },
+        {
+          "name": "シュウマィ",
+          "received": true
+        },
+        {
+          "name": "つねやす",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2024-03-04",
+      "item": "アンタラスの心臓（蘇生",
+      "price": 28000000,
+      "count": 7,
+      "onePrice": 4000000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "Rinfone",
+          "received": false
+        },
+        {
+          "name": "evergarden",
+          "received": true
+        },
+        {
+          "name": "シュウマィ",
+          "received": true
+        },
+        {
+          "name": "忍穂",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2024-08-20",
+      "item": "アンタラス心臓",
+      "price": 25000000,
+      "count": 7,
+      "onePrice": 3571429,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "あいあーる",
+          "received": true
+        },
+        {
+          "name": "シュウマィ",
+          "received": true
+        },
+        {
+          "name": "忍穂",
+          "received": true
+        },
+        {
+          "name": "ルージュラ",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2024-09-04",
+      "item": "傲慢アミュ２階（蘇生",
+      "price": 300000,
+      "count": 5,
+      "onePrice": 60000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "evergarden",
+          "received": true
+        },
+        {
+          "name": "シュウマィ",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2024-09-23",
+      "item": "青鱗",
+      "price": null,
+      "count": 6,
+      "onePrice": null,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "evergarden",
+          "received": false
+        },
+        {
+          "name": "あいあーる",
+          "received": false
+        },
+        {
+          "name": "シュウマィ",
+          "received": false
+        },
+        {
+          "name": "忍穂",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2024-09-23",
+      "item": "緑鱗",
+      "price": 3000000,
+      "count": 5,
+      "onePrice": 600000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "evergarden",
+          "received": true
+        },
+        {
+          "name": "シュウマィ",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2024-09-29",
+      "item": "浄化のブーツ(蘇生)",
+      "price": 2500000,
+      "count": 4,
+      "onePrice": 625000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "あいあーる",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2024-09-30",
+      "item": "赤鱗",
+      "price": null,
+      "count": 5,
+      "onePrice": null,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "らむえる",
+          "received": false
+        },
+        {
+          "name": "evergarden",
+          "received": false
+        },
+        {
+          "name": "忍穂",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2024-10-20",
+      "item": "浄化のブーツ(蘇生)",
+      "price": 2500000,
+      "count": 5,
+      "onePrice": 500000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "evergarden",
+          "received": true
+        },
+        {
+          "name": "忍穂",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2024-11-27",
+      "item": "■浄化のブーツ(蘇生)",
+      "price": 5358000,
+      "count": 6,
+      "onePrice": 893000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "evergarden",
+          "received": true
+        },
+        {
+          "name": "あいあーる",
+          "received": true
+        },
+        {
+          "name": "忍穂",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2024-12-06",
+      "item": "■浄化のブーツ(蘇生)",
+      "price": 2679000,
+      "count": 3,
+      "onePrice": 893000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "Rinfone",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2025-01-02",
+      "item": "■浄化のブーツ(蘇生)",
+      "price": 5358000,
+      "count": 6,
+      "onePrice": 893000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "evergarden",
+          "received": true
+        },
+        {
+          "name": "シュウマィ",
+          "received": true
+        },
+        {
+          "name": "忍穂",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2025-01-08",
+      "item": "浄化のブーツ",
+      "price": 43650000,
+      "count": 6,
+      "onePrice": 7275000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "evergarden",
+          "received": true
+        },
+        {
+          "name": "シュウマィ",
+          "received": true
+        },
+        {
+          "name": "忍穂",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2025-01-17",
+      "item": "パプリオンの心臓",
+      "price": 179450000,
+      "count": 6,
+      "onePrice": 29908333,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "evergarden",
+          "received": true
+        },
+        {
+          "name": "シュウマィ",
+          "received": true
+        },
+        {
+          "name": "忍穂",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2025-06-28",
+      "item": "パプリオンの心臓(蘇生)",
+      "price": 38800000,
+      "count": 6,
+      "onePrice": 6466666,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "evergarden",
+          "received": true
+        },
+        {
+          "name": "シュウマィ",
+          "received": true
+        },
+        {
+          "name": "忍穂",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2025-08-17",
+      "item": "白鱗",
+      "price": null,
+      "count": 6,
+      "onePrice": null,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "らむえる",
+          "received": false
+        },
+        {
+          "name": "evergarden",
+          "received": false
+        },
+        {
+          "name": "シュウマィ",
+          "received": false
+        },
+        {
+          "name": "忍穂",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2025-09-01",
+      "item": "傲慢アミュ3階(蘇生)",
+      "price": 180000,
+      "count": 6,
+      "onePrice": 30000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "evergarden",
+          "received": true
+        },
+        {
+          "name": "あいあーる",
+          "received": true
+        },
+        {
+          "name": "シュウマィ",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2025-10-02",
+      "item": "浄化のブーツ",
+      "price": 43650000,
+      "count": 7,
+      "onePrice": 6235714,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ルリリ",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "evergarden",
+          "received": true
+        },
+        {
+          "name": "あいあーる",
+          "received": true
+        },
+        {
+          "name": "シュウマィ",
+          "received": true
+        },
+        {
+          "name": "忍穂",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2025-10-08",
+      "item": "浄化のブーツ(蘇生)",
+      "price": 5000000,
+      "count": 8,
+      "onePrice": 625000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "ルリリ",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "あいあーる",
+          "received": true
+        },
+        {
+          "name": "シュウマィ",
+          "received": true
+        },
+        {
+          "name": "忍穂",
+          "received": true
+        },
+        {
+          "name": "つねやす",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2025-10-14",
+      "item": "フェイタルポーション",
+      "price": 3880000,
+      "count": 6,
+      "onePrice": 646667,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "ルリリ",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "evergarden",
+          "received": true
+        },
+        {
+          "name": "シュウマィ",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2025-10-29",
+      "item": "■浄化のブーツ(蘇生)[7人]",
+      "price": 6251000,
+      "count": 7,
+      "onePrice": 893000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "ルリリ",
+          "received": false
+        },
+        {
+          "name": "らむえる",
+          "received": false
+        },
+        {
+          "name": "evergarden",
+          "received": false
+        },
+        {
+          "name": "シュウマィ",
+          "received": false
+        },
+        {
+          "name": "忍穂",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2025-10-29",
+      "item": "■浄化のブーツ(蘇生)[8人]",
+      "price": 7144000,
+      "count": 8,
+      "onePrice": 893000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "ルリリ",
+          "received": false
+        },
+        {
+          "name": "らむえる",
+          "received": false
+        },
+        {
+          "name": "Rinfone",
+          "received": false
+        },
+        {
+          "name": "evergarden",
+          "received": false
+        },
+        {
+          "name": "シュウマィ",
+          "received": false
+        },
+        {
+          "name": "忍穂",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2025-11-12",
+      "item": "■浄化のブーツ(蘇生)",
+      "price": 7144000,
+      "count": 8,
+      "onePrice": 893000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "ルリリ",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "evergarden",
+          "received": true
+        },
+        {
+          "name": "あいあーる",
+          "received": true
+        },
+        {
+          "name": "シュウマィ",
+          "received": true
+        },
+        {
+          "name": "忍穂",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2025-12-24",
+      "item": "■浄化のブーツ(蘇生)",
+      "price": 6251000,
+      "count": 7,
+      "onePrice": 893000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "ルリリ",
+          "received": false
+        },
+        {
+          "name": "らむえる",
+          "received": false
+        },
+        {
+          "name": "Rinfone",
+          "received": false
+        },
+        {
+          "name": "シュウマィ",
+          "received": false
+        },
+        {
+          "name": "忍穂",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2026-01-08",
+      "item": "精霊水晶ダンシングブレイス",
+      "price": null,
+      "count": 4,
+      "onePrice": null,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "らむえる",
+          "received": false
+        },
+        {
+          "name": "シュウマィ",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2026-01-17",
+      "item": "ヴァラカスの心臓(蘇生)",
+      "price": 180000000,
+      "count": 6,
+      "onePrice": 30000000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ルリリ",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "白岳",
+          "received": true
+        },
+        {
+          "name": "シュウマィ",
+          "received": true
+        },
+        {
+          "name": "忍穂",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2026-01-30",
+      "item": "■浄化のブーツ(蘇生)",
+      "price": 5358000,
+      "count": 6,
+      "onePrice": 893000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "ルリリ",
+          "received": false
+        },
+        {
+          "name": "らむえる",
+          "received": false
+        },
+        {
+          "name": "evergarden",
+          "received": false
+        },
+        {
+          "name": "忍穂",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2026-02-05",
+      "item": "白鱗",
+      "price": null,
+      "count": 7,
+      "onePrice": null,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "ルリリ",
+          "received": false
+        },
+        {
+          "name": "らむえる",
+          "received": false
+        },
+        {
+          "name": "evergarden",
+          "received": false
+        },
+        {
+          "name": "シュウマィ",
+          "received": false
+        },
+        {
+          "name": "忍穂",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2026-02-06",
+      "item": "浄化のブーツ(蘇生)",
+      "price": 5000000,
+      "count": 7,
+      "onePrice": 714286,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "ルリリ",
+          "received": false
+        },
+        {
+          "name": "らむえる",
+          "received": false
+        },
+        {
+          "name": "白岳",
+          "received": false
+        },
+        {
+          "name": "シュウマィ",
+          "received": false
+        },
+        {
+          "name": "忍穂",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2026-02-10",
+      "item": "赤い鱗",
+      "price": null,
+      "count": 7,
+      "onePrice": null,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "ルリリ",
+          "received": false
+        },
+        {
+          "name": "evergarden",
+          "received": false
+        },
+        {
+          "name": "あいあーる",
+          "received": false
+        },
+        {
+          "name": "シュウマィ",
+          "received": false
+        },
+        {
+          "name": "忍穂",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2026-02-23",
+      "item": "エクセレントソード(蘇生)",
+      "price": null,
+      "count": 7,
+      "onePrice": null,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "ルリリ",
+          "received": false
+        },
+        {
+          "name": "らむえる",
+          "received": false
+        },
+        {
+          "name": "evergarden",
+          "received": false
+        },
+        {
+          "name": "あいあーる",
+          "received": false
+        },
+        {
+          "name": "シュウマィ",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2026-02-26",
+      "item": "知恵のブーツ",
+      "price": 3820000,
+      "count": 7,
+      "onePrice": 545714,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "ルリリ",
+          "received": true
+        },
+        {
+          "name": "らむえる",
+          "received": true
+        },
+        {
+          "name": "evergarden",
+          "received": true
+        },
+        {
+          "name": "あいあーる",
+          "received": true
+        },
+        {
+          "name": "シュウマィ",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2026-03-17",
+      "item": "賢者のアミュレット",
+      "price": 30070000,
+      "count": 5,
+      "onePrice": 6014000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "evergarden",
+          "received": false
+        },
+        {
+          "name": "あいあーる",
+          "received": false
+        },
+        {
+          "name": "シュウマィ",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2026-03-24",
+      "item": "ハリケーン(蘇生)",
+      "price": null,
+      "count": 7,
+      "onePrice": null,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "ルリリ",
+          "received": false
+        },
+        {
+          "name": "らむえる",
+          "received": false
+        },
+        {
+          "name": "evergarden",
+          "received": false
+        },
+        {
+          "name": "あいあーる",
+          "received": false
+        },
+        {
+          "name": "シュウマィ",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2026-04-16",
+      "item": "ｸﾞﾘｰﾝﾄﾞﾗｺﾞﾝの鱗",
+      "price": null,
+      "count": 7,
+      "onePrice": null,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "ルリリ",
+          "received": false
+        },
+        {
+          "name": "らむえる",
+          "received": false
+        },
+        {
+          "name": "あいあーる",
+          "received": false
+        },
+        {
+          "name": "シュウマィ",
+          "received": false
+        },
+        {
+          "name": "忍穂",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2026-04-24",
+      "item": "浄化のブーツ",
+      "price": 56260000,
+      "count": 5,
+      "onePrice": 11252000,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": true
+        },
+        {
+          "name": "ネット",
+          "received": true
+        },
+        {
+          "name": "ルリリ",
+          "received": true
+        },
+        {
+          "name": "白岳",
+          "received": true
+        },
+        {
+          "name": "忍穂",
+          "received": true
+        }
+      ]
+    },
+    {
+      "date": "2026-05-04",
+      "item": "潜在石:遠距離ダメ",
+      "price": 8730000,
+      "count": 8,
+      "onePrice": 1091250,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "ルリリ",
+          "received": false
+        },
+        {
+          "name": "らむえる",
+          "received": false
+        },
+        {
+          "name": "白岳",
+          "received": false
+        },
+        {
+          "name": "Rinfone",
+          "received": false
+        },
+        {
+          "name": "evergarden",
+          "received": false
+        },
+        {
+          "name": "あいあーる",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2026-05-25",
+      "item": "緑の鱗",
+      "price": null,
+      "count": 8,
+      "onePrice": null,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "ルリリ",
+          "received": false
+        },
+        {
+          "name": "らむえる",
+          "received": false
+        },
+        {
+          "name": "白岳",
+          "received": false
+        },
+        {
+          "name": "evergarden",
+          "received": false
+        },
+        {
+          "name": "あいあーる",
+          "received": false
+        },
+        {
+          "name": "シュウマィ",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2026-06-09",
+      "item": "潜在石+690k",
+      "price": 11360000,
+      "count": 9,
+      "onePrice": 1262222,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "ルリリ",
+          "received": false
+        },
+        {
+          "name": "らむえる",
+          "received": false
+        },
+        {
+          "name": "白岳",
+          "received": false
+        },
+        {
+          "name": "Rinfone",
+          "received": false
+        },
+        {
+          "name": "evergarden",
+          "received": false
+        },
+        {
+          "name": "あいあーる",
+          "received": false
+        },
+        {
+          "name": "シュウマィ",
+          "received": false
+        }
+      ]
+    },
+    {
+      "date": "2026-06-14",
+      "item": "蘇生ブーツ",
+      "price": null,
+      "count": 7,
+      "onePrice": null,
+      "participants": [
+        {
+          "name": "みゅうたん",
+          "received": false,
+          "receivedDate": null
+        },
+        {
+          "name": "ネット",
+          "received": false
+        },
+        {
+          "name": "ルリリ",
+          "received": false
+        },
+        {
+          "name": "らむえる",
+          "received": false
+        },
+        {
+          "name": "白岳",
+          "received": false
+        },
+        {
+          "name": "evergarden",
+          "received": false
+        },
+        {
+          "name": "シュウマィ",
+          "received": false
+        }
+      ]
+    }
+  ],
+  "adminPassword": "1234"
+}
