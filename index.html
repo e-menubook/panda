@@ -194,7 +194,7 @@ button.gray{
     font-size: 11px;
     white-space: nowrap;
     cursor: pointer;
-    pointer-events: auto !important; /* ヘッダー全体のpointer-events:noneを打ち消す */
+    pointer-events: auto !important; /* ヘッダー全体のpointer-events:noneを打ち共す */
 }
 .unreceived-name-badge:hover {
     background: #ffcdd2;
@@ -357,8 +357,8 @@ button.gray{
     <div class="card">
         <h2>分配一覧 <span style="font-size:12px; color:#666; font-weight:normal;">(タップで詳細を開閉 / 名前タップで一括管理)</span></h2>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 10px;">
-            <button class="gray" onclick="sortHistory('date')" style="padding: 8px; font-size: 12px;">日付順</button>
-            <button class="gray" onclick="sortHistory('item')" style="padding: 8px; font-size: 12px;">名前順</button>
+            <button class="gray" onclick="sortHistory('date_desc')" style="padding: 8px; font-size: 12px;">日付（降順）</button>
+            <button class="gray" onclick="sortHistory('date_asc')" style="padding: 8px; font-size: 12px;">日付（昇順）</button>
             <button class="gray" onclick="sortHistory('status')" style="padding: 8px; font-size: 12px;">未分配優先</button>
         </div>
         <div id="history"></div>
@@ -418,6 +418,28 @@ button.gray{
         <br><br>
         <button class="blue" onclick="changePassword()">パスワードを変更する</button>
     </div>
+
+    <div class="card">
+        <h2>データのバックアップ（セーブ＆ロード）</h2>
+        <p class="small" style="margin-bottom: 15px; line-height: 1.4;">データの保存（バックアップ作成）、復元（読み込み）、初期データの取得を行えます。</p>
+        
+        <label>① 現在のデータを保存する</label>
+        <button class="blue" onclick="exportBackup()" style="width:100%; padding:15px; font-size:16px; font-weight:bold; border-radius:8px; cursor:pointer; margin-bottom: 10px;">バックアップファイル作成</button>
+        
+        <label>② 保存したファイルを読み込む</label>
+        <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importBackup(event)">
+        <button class="green" onclick="document.getElementById('importFile').click()" style="width:100%; padding:15px; font-size:16px; font-weight:bold; border-radius:8px; cursor:pointer; margin-bottom: 10px;">バックアップファイル読込</button>
+        
+        <label>③ 初期データを取得する</label>
+        <a id="downloadLink" href="panda_backup_2026-06-30 (1).json" download="panda_backup_2026-06-30 (1).json" style="display:none;"></a>
+        <button class="blue" onclick="document.getElementById('downloadLink').click()" style="width:100%; padding:15px; font-size:16px; font-weight:bold; border-radius:8px; background:#ff9800; cursor:pointer;">初回データダウンロード</button>
+    </div>
+
+    <div class="card" style="border: 1px solid #e53935;">
+        <h2 style="border-left-color: #e53935; color: #e53935;">全登録データの一括削除（初期化）</h2>
+        <p class="small" style="margin-bottom: 15px; line-height: 1.4;">現在登録されているすべてのキャラクターリスト、分配履歴、変更された管理用パスワードを一括削除して初期状態にリセットします。</p>
+        <button class="red" onclick="clearAllData()" style="width:100%; padding:15px; font-size:16px; font-weight:bold; border-radius:8px;">すべてのデータを一括削除する</button>
+    </div>
 </div>
 
 <div id="unreceivedModal" class="modal-overlay" onclick="closeModal()">
@@ -439,60 +461,8 @@ button.gray{
 </div>
 
 <script>
-// キャラ初期データ
-let defaultMembers = [
-    "みゅうたん", "ネット", "ルリリ", "らむえる", "白岳", 
-    "Rinfone", "evergarden", "あいあーる", "シュウマィ", 
-    "忍穂", "つねやす", "ルージュラ", "飛呂斗"
-];
-
-// 初期データ全44件
-let defaultHistory = [
-    { date: "2023-10-10", item: "ファイアーストーム", price: null, count: 4, onePrice: null, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "らむえる", received: false }, { name: "シュウマィ", received: false }] },
-    { date: "2023-11-05", item: "ドラゴンの心臓", price: 10000000, count: 5, onePrice: 2000000, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "らむえる", received: true }, { name: "シュウマィ", received: true }, { name: "つねやす", received: false }] },
-    { date: "2024-01-30", item: "変コン", price: null, count: 5, onePrice: null, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "らむえる", received: false }, { name: "あいあーる", received: false }, { name: "つねやす", received: false }] },
-    { date: "2024-02-04", item: "傲慢アミュ４階（蘇生", price: 500000, count: 5, onePrice: 100000, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "らむえる", received: true }, { name: "あいあーる", received: true }, { name: "飛呂斗", received: false }] },
-    { date: "2024-02-08", item: "DKヘルム", price: 5000000, count: 6, onePrice: 833333, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "らむえる", received: true }, { name: "あいあーる", received: true }, { name: "シュウマィ", received: true }, { name: "つねやす", received: true }] },
-    { date: "2024-03-04", item: "アンタラスの心臓（蘇生", price: 28000000, count: 7, onePrice: 4000000, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "らむえる", received: true }, { name: "Rinfone", received: false }, { name: "evergarden", received: true }, { name: "シュウマィ", received: true }, { name: "忍穂", received: true }] },
-    { date: "2024-08-20", item: "アンタラス心臓", price: 25000000, count: 7, onePrice: 3571429, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "らむえる", received: true }, { name: "あいあーる", received: true }, { name: "シュウマィ", received: true }, { name: "忍穂", received: true }, { name: "ルージュラ", received: false }] },
-    { date: "2024-09-04", item: "傲慢アミュ２階（蘇生", price: 300000, count: 5, onePrice: 60000, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "らむえる", received: true }, { name: "evergarden", received: true }, { name: "シュウマィ", received: true }] },
-    { date: "2024-09-23", item: "緑鱗", price: 3000000, count: 5, onePrice: 600000, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "らむえる", received: true }, { name: "evergarden", received: true }, { name: "シュウマィ", received: true }] },
-    { date: "2024-09-23", item: "青鱗", price: null, count: 6, onePrice: null, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "evergarden", received: false }, { name: "あいあーる", received: false }, { name: "シュウマィ", received: false }, { name: "忍穂", received: false }] },
-    { date: "2024-09-29", item: "浄化のブーツ(蘇生)", price: 2500000, count: 4, onePrice: 625000, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "らむえる", received: true }, { name: "あいあーる", received: true }] },
-    { date: "2024-09-30", item: "赤鱗", price: null, count: 5, onePrice: null, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "らむえる", received: false }, { name: "evergarden", received: false }, { name: "忍穂", received: false }] },
-    { date: "2024-10-20", item: "浄化のブーツ(蘇生)", price: 2500000, count: 5, onePrice: 500000, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "らむえる", received: true }, { name: "evergarden", received: true }, { name: "忍穂", received: true }] },
-    { date: "2024-11-27", item: "■浄化のブーツ(蘇生)", price: 5358000, count: 6, onePrice: 893000, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "らむえる", received: true }, { name: "evergarden", received: true }, { name: "あいあーる", received: true }, { name: "忍穂", received: true }] },
-    { date: "2024-12-06", item: "■浄化のブーツ(蘇生)", price: 2679000, count: 3, onePrice: 893000, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "Rinfone", received: true }] },
-    { date: "2025-01-02", item: "■浄化のブーツ(蘇生)", price: 5358000, count: 6, onePrice: 893000, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "らむえる", received: true }, { name: "evergarden", received: true }, { name: "シュウマィ", received: true }, { name: "忍穂", received: true }] },
-    { date: "2025-01-08", item: "浄化のブーツ", price: 43650000, count: 6, onePrice: 7275000, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "らむえる", received: true }, { name: "evergarden", received: true }, { name: "シュウマィ", received: true }, { name: "忍穂", received: true }] },
-    { date: "2025-01-17", item: "パプリオンの心臓", price: 179450000, count: 6, onePrice: 29908333, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "らむえる", received: true }, { name: "evergarden", received: true }, { name: "シュウマィ", received: true }, { name: "忍穂", received: true }] },
-    { date: "2025-06-28", item: "パプリオンの心臓(蘇生)", price: 38800000, count: 6, onePrice: 6466666, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "らむえる", received: true }, { name: "evergarden", received: true }, { name: "シュウマィ", received: true }, { name: "忍穂", received: true }] },
-    { date: "2025-08-17", item: "白鱗", price: null, count: 6, onePrice: null, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "らむえる", received: false }, { name: "evergarden", received: false }, { name: "シュウマィ", received: false }, { name: "忍穂", received: false }] },
-    { date: "2025-09-01", item: "傲慢アミュ3階(蘇生)", price: 180000, count: 6, onePrice: 30000, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "らむえる", received: true }, { name: "evergarden", received: true }, { name: "あいあーる", received: true }, { name: "シュウマィ", received: true }] },
-    { date: "2025-10-02", item: "浄化のブーツ", price: 43650000, count: 7, onePrice: 6235714, participants: [{ name: "みゅうたん", received: true }, { name: "ルリリ", received: true }, { name: "らむえる", received: true }, { name: "evergarden", received: true }, { name: "あいあーる", received: true }, { name: "シュウマィ", received: true }, { name: "忍穂", received: true }] },
-    { date: "2025-10-08", item: "浄化のブーツ(蘇生)", price: 5000000, count: 8, onePrice: 625000, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "ルリリ", received: true }, { name: "らむえる", received: true }, { name: "あいあーる", received: true }, { name: "シュウマィ", received: true }, { name: "忍穂", received: true }, { name: "つねやす", received: true }] },
-    { date: "2025-10-14", item: "フェイタルポーション", price: 3880000, count: 6, onePrice: 646667, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "ルリリ", received: true }, { name: "らむえる", received: true }, { name: "evergarden", received: true }, { name: "シュウマィ", received: true }] },
-    { date: "2025-10-29", item: "■浄化のブーツ(蘇生)[7人]", price: 6251000, count: 7, onePrice: 893000, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "ルリリ", received: false }, { name: "らむえる", received: false }, { name: "evergarden", received: false }, { name: "シュウマィ", received: false }, { name: "忍穂", received: false }] },
-    { date: "2025-10-29", item: "■浄化のブーツ(蘇生)[8人]", price: 7144000, count: 8, onePrice: 893000, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "ルリリ", received: false }, { name: "らむえる", received: false }, { name: "Rinfone", received: false }, { name: "evergarden", received: false }, { name: "シュウマィ", received: false }, { name: "忍穂", received: false }] },
-    { date: "2025-11-12", item: "■浄化のブーツ(蘇生)", price: 7144000, count: 8, onePrice: 893000, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "ルリリ", received: true }, { name: "らむえる", received: true }, { name: "evergarden", received: true }, { name: "あいあーる", received: true }, { name: "シュウマィ", received: true }, { name: "忍穂", received: true }] },
-    { date: "2025-12-24", item: "■浄化のブーツ(蘇生)", price: 6251000, count: 7, onePrice: 893000, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "ルリリ", received: false }, { name: "らむえる", received: false }, { name: "Rinfone", received: false }, { name: "シュウマィ", received: false }, { name: "忍穂", received: false }] },
-    { date: "2026-01-08", item: "精霊水晶ダンシングブレイス", price: null, count: 4, onePrice: null, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "らむえる", received: false }, { name: "シュウマィ", received: false }] },
-    { date: "2026-01-17", item: "ヴァラカスの心臓(蘇生)", price: 180000000, count: 6, onePrice: 30000000, participants: [{ name: "みゅうたん", received: true }, { name: "ルリリ", received: true }, { name: "らむえる", received: true }, { name: "白岳", received: true }, { name: "シュウマィ", received: true }, { name: "忍穂", received: true }] },
-    { date: "2026-01-30", item: "■浄化のブーツ(蘇生)", price: 5358000, count: 6, onePrice: 893000, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "ルリリ", received: false }, { name: "らむえる", received: false }, { name: "evergarden", received: false }, { name: "忍穂", received: false }] },
-    { date: "2026-02-05", item: "白鱗", price: null, count: 7, onePrice: null, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "ルリリ", received: false }, { name: "らむえる", received: false }, { name: "evergarden", received: false }, { name: "シュウマィ", received: false }, { name: "忍穂", received: false }] },
-    { date: "2026-02-06", item: "浄化のブーツ(蘇生)", price: 5000000, count: 7, onePrice: 714286, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "ルリリ", received: false }, { name: "らむえる", received: false }, { name: "白岳", received: false }, { name: "シュウマィ", received: false }, { name: "忍穂", received: false }] },
-    { date: "2026-02-10", item: "赤い鱗", price: null, count: 7, onePrice: null, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "ルリリ", received: false }, { name: "evergarden", received: false }, { name: "あいあーる", received: false }, { name: "シュウマィ", received: false }, { name: "忍穂", received: false }] },
-    { date: "2026-02-23", item: "エクセレントソード(蘇生)", price: null, count: 7, onePrice: null, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "ルリリ", received: false }, { name: "らむえる", received: false }, { name: "evergarden", received: false }, { name: "あいあーる", received: false }, { name: "シュウマィ", received: false }] },
-    { date: "2026-02-26", item: "知恵のブーツ", price: 3820000, count: 7, onePrice: 545714, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "ルリリ", received: true }, { name: "らむえる", received: true }, { name: "evergarden", received: true }, { name: "あいあーる", received: true }, { name: "シュウマィ", received: true }] },
-    { date: "2026-03-17", item: "賢者のアミュレット", price: 30070000, count: 5, onePrice: 6014000, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "evergarden", received: false }, { name: "あいあーる", received: false }, { name: "シュウマィ", received: false }] },
-    { date: "2026-03-24", item: "ハリケーン(蘇生)", price: null, count: 7, onePrice: null, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "ルリリ", received: false }, { name: "らむえる", received: false }, { name: "evergarden", received: false }, { name: "あいあーる", received: false }, { name: "シュウマィ", received: false }] },
-    { date: "2026-04-16", item: "ｸﾞﾘｰﾝﾄﾞﾗｺﾞﾝの鱗", price: null, count: 7, onePrice: null, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "ルリリ", received: false }, { name: "らむえる", received: false }, { name: "あいあーる", received: false }, { name: "シュウマィ", received: false }, { name: "忍穂", received: false }] },
-    { date: "2026-04-24", item: "浄化のブーツ", price: 56260000, count: 5, onePrice: 11252000, participants: [{ name: "みゅうたん", received: true }, { name: "ネット", received: true }, { name: "ルリリ", received: true }, { name: "白岳", received: true }, { name: "忍穂", received: true }] },
-    { date: "2026-05-04", item: "潜在石:遠距離ダメ", price: 8730000, count: 8, onePrice: 1091250, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "ルリリ", received: false }, { name: "らむえる", received: false }, { name: "白岳", received: false }, { name: "Rinfone", received: false }, { name: "evergarden", received: false }, { name: "あいあーる", received: false }] },
-    { date: "2026-05-25", item: "緑の鱗", price: null, count: 8, onePrice: null, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "ルリリ", received: false }, { name: "らむえる", received: false }, { name: "白岳", received: false }, { name: "evergarden", received: false }, { name: "あいあーる", received: false }, { name: "シュウマィ", received: false }] },
-    { date: "2026-06-09", item: "潜在石+690k", price: 11360000, count: 9, onePrice: 1262222, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "ルリリ", received: false }, { name: "らむえる", received: false }, { name: "白岳", received: false }, { name: "Rinfone", received: false }, { name: "evergarden", received: false }, { name: "あいあーる", received: false }, { name: "シュウマィ", received: false }] },
-    { date: "2026-06-14", item: "蘇生ブーツ", price: null, count: 7, onePrice: null, participants: [{ name: "みゅうたん", received: false }, { name: "ネット", received: false }, { name: "ルリリ", received: false }, { name: "らむえる", received: false }, { name: "白岳", received: false }, { name: "evergarden", received: false }, { name: "シュウマィ", received: false }] }
-];
+let defaultMembers = [];
+let defaultHistory = [];
 
 if(!localStorage.getItem("history")) localStorage.setItem("history", JSON.stringify(defaultHistory));
 if(!localStorage.getItem("members")) localStorage.setItem("members", JSON.stringify(defaultMembers));
@@ -504,12 +474,11 @@ let editingIndex = null;
 let openIndexes = {}; 
 
 function sortHistory(key) {
-    if (key === 'date') {
+    if (key === 'date_desc') {
         history.sort((a, b) => new Date(b.date) - new Date(a.date));
-    } else if (key === 'item') {
-        history.sort((a, b) => a.item.localeCompare(b.item, 'ja'));
+    } else if (key === 'date_asc') {
+        history.sort((a, b) => new Date(a.date) - new Date(b.date));
     } else if (key === 'status') {
-        // ステータス優先：未分配(0) > 一部(1) > 完了(2)
         history.sort((a, b) => getStatusScore(a) - getStatusScore(b));
     }
     openIndexes = {};
@@ -520,9 +489,9 @@ function sortHistory(key) {
 function getStatusScore(h) {
     const doneCount = h.participants.filter(p => p.received).length;
     const total = h.participants.length;
-    if (doneCount === 0) return 0; // 未分配
-    if (doneCount < total) return 1; // 一部済
-    return 2; // 完了
+    if (doneCount === 0) return 0;
+    if (doneCount < total) return 1;
+    return 2;
 }
 
 function showPage(id, obj){
@@ -665,7 +634,8 @@ function saveHistory(){
 
     const participantStatus = selectedParticipants.map(name => ({
         name: name,
-        received: false
+        received: false,
+        receivedDate: null
     }));
 
     history.unshift({
@@ -749,7 +719,6 @@ function drawHistory(){
             badge = `<span class="status-badge badge-done">分配完了 🎉</span>`;
         }
 
-        // 未受取のメンバー抽出
         const unreceivedMembers = h.participants.filter(p => !p.received);
         let unreceivedBadgesHtml = "";
         if (unreceivedMembers.length > 0 && doneCount < total) {
@@ -787,9 +756,14 @@ function drawHistory(){
         h.participants.forEach((p, pIdx) => {
             const btnClass = p.received ? "receiver-btn received" : "receiver-btn";
             const mark = p.received ? "⭕" : "❌";
+            const dateDisplay = p.received && p.receivedDate ? `<br><span style="font-size: 11px; font-weight: normal; color: #555; opacity: 0.85;">${p.receivedDate}</span>` : "";
+            
             receiverButtons += `
-                <div class="${btnClass}" onclick="event.stopPropagation(); toggleReceived(${index}, ${pIdx});">
-                    ${p.name} [${mark}]
+                <div class="${btnClass}" 
+                     data-h-idx="${index}" 
+                     data-p-idx="${pIdx}" 
+                     style="text-align: center; line-height: 1.4; padding: 8px 12px; height: auto;">
+                    ${p.name} [${mark}]${dateDisplay}
                 </div>
             `;
         });
@@ -822,7 +796,7 @@ function drawHistory(){
                 </div>
                 
                 <div style="border-top:1px dashed #ddd; padding-top:10px; margin-bottom:15px;">
-                    <span class="small" style="font-weight:bold; color:#555;">受取状況 (名札タップで切替):</span>
+                    <span class="small" style="font-weight:bold; color:#555;">受取状況 (名前タップで切替):</span>
                     <div class="receiver-list">
                         ${receiverButtons}
                     </div>
@@ -836,9 +810,96 @@ function drawHistory(){
         </div>
         `;
     });
+
+    setupReceiverButtonEvents();
 }
 
-// 別窓（モーダル）を開き、特定キャラの未受取リストを生成する
+function setupReceiverButtonEvents() {
+    const buttons = document.querySelectorAll('.receiver-list .receiver-btn');
+    buttons.forEach(btn => {
+        let pressTimer = null;
+        let isLongPress = false;
+
+        const startPress = (e) => {
+            isLongPress = false;
+            pressTimer = setTimeout(() => {
+                isLongPress = true;
+                const hIdx = parseInt(btn.getAttribute('data-h-idx'));
+                const pIdx = parseInt(btn.getAttribute('data-p-idx'));
+                handleReceiverPress(hIdx, pIdx, true);
+            }, 500);
+        };
+
+        const endPress = (e) => {
+            clearTimeout(pressTimer);
+            if (!isLongPress && e.type !== 'mouseleave') {
+                const hIdx = parseInt(btn.getAttribute('data-h-idx'));
+                const pIdx = parseInt(btn.getAttribute('data-p-idx'));
+                handleReceiverPress(hIdx, pIdx, false);
+            }
+        };
+
+        btn.addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+            startPress(e);
+        }, { passive: true });
+        btn.addEventListener('touchend', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            endPress(e);
+        });
+
+        btn.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+            if (e.button === 0) startPress(e);
+        });
+        btn.addEventListener('mouseup', (e) => {
+            e.stopPropagation();
+            if (e.button === 0) endPress(e);
+        });
+        btn.addEventListener('mouseleave', () => {
+            clearTimeout(pressTimer);
+        });
+    });
+}
+
+function handleReceiverPress(historyIndex, participantIndex, forceSelectDate) {
+    const currentStatus = history[historyIndex].participants[participantIndex].received;
+    const name = history[historyIndex].participants[participantIndex].name;
+    const savedPassword = localStorage.getItem("adminPassword");
+
+    if (currentStatus === true) {
+        if (!confirm(`${name} さんを「未受取」に戻します。よろしいですか？`)) return;
+
+        const userInput = prompt("受取を戻すには管理用パスワードを入力してください：");
+        if (userInput === null) return;
+
+        if (userInput !== savedPassword) {
+            alert("パスワードが違います。変更できません。");
+            return;
+        }
+        
+        history[historyIndex].participants[participantIndex].received = false;
+        history[historyIndex].participants[participantIndex].receivedDate = null;
+    } else {
+        let receiveDate = "";
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        if (forceSelectDate) {
+            receiveDate = prompt(`${name} さんの受取日を入力してください：`, todayStr);
+            if (receiveDate === null) return;
+        } else {
+            receiveDate = todayStr;
+        }
+
+        history[historyIndex].participants[participantIndex].received = true;
+        history[historyIndex].participants[participantIndex].receivedDate = receiveDate;
+    }
+    
+    saveLocal();
+    drawHistory();
+}
+
 function openUnreceivedSummary(memberName) {
     document.getElementById("modalTitle").innerText = `【${memberName}】の未受取明細`;
     
@@ -904,10 +965,15 @@ function bulkReceiveAction(memberName) {
         return;
     }
 
+    const todayStr = new Date().toISOString().split('T')[0];
+    const receiveDate = prompt("受取日を入力してください：", todayStr);
+    if (receiveDate === null) return;
+
     history.forEach((h) => {
         h.participants.forEach((p) => {
             if (p.name === memberName && !p.received) {
                 p.received = true;
+                p.receivedDate = receiveDate;
             }
         });
     });
@@ -916,31 +982,6 @@ function bulkReceiveAction(memberName) {
     drawHistory();
     closeModal();
     alert(`${memberName} さんの未受取アイテムを一括受取済にしました。`);
-}
-
-function toggleReceived(historyIndex, participantIndex) {
-    const currentStatus = history[historyIndex].participants[participantIndex].received;
-    const name = history[historyIndex].participants[participantIndex].name;
-    const savedPassword = localStorage.getItem("adminPassword");
-
-    if (currentStatus === true) {
-        if (!confirm(`${name} さんを「未受取」に戻します。よろしいですか？`)) {
-            return;
-        }
-
-        const userInput = prompt("受取を戻すには管理用パスワードを入力してください：");
-        if (userInput === null) return;
-
-        if (userInput !== savedPassword) {
-            alert("パスワードが違います。変更できません。");
-            return;
-        }
-    } else {
-    }
-    
-    history[historyIndex].participants[participantIndex].received = !currentStatus;
-    saveLocal();
-    drawHistory();
 }
 
 function deleteHistory(index){
@@ -963,6 +1004,82 @@ function deleteHistory(index){
     alert("削除しました。");
 }
 
+function exportBackup() {
+    const backupData = {
+        members: JSON.parse(localStorage.getItem("members")),
+        history: JSON.parse(localStorage.getItem("history")),
+        adminPassword: localStorage.getItem("adminPassword")
+    };
+    
+    const jsonString = JSON.stringify(backupData, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement("a");
+    const today = new Date().toISOString().split('T')[0];
+    a.href = url;
+    a.download = `panda_backup_${today}.json`;
+    a.click();
+    
+    URL.revokeObjectURL(url);
+}
+
+function importBackup(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    if (!confirm("バックアップファイルを読み込むと、現在のデータ（メンバーリスト、履歴、パスワード）はすべて上書きされます。よろしいですか？")) {
+        event.target.value = ""; 
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (data.members && data.history) {
+                localStorage.setItem("members", JSON.stringify(data.members));
+                localStorage.setItem("history", JSON.stringify(data.history));
+                if (data.adminPassword) {
+                    localStorage.setItem("adminPassword", data.adminPassword);
+                }
+                
+                alert("データの復元（ロード）が完了しました！ページを再読み込みします。");
+                location.reload();
+            } else {
+                alert("正しいバックアップファイルではないか、データ構造が破損しています。");
+            }
+        } catch (err) {
+            alert("ファイルの読み込みに失敗しました。正しいJSONファイルかご確認ください。");
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = ""; 
+}
+
+function clearAllData() {
+    const savedPassword = localStorage.getItem("adminPassword");
+    
+    if (!confirm("【警告】現在登録されているすべてのデータ（キャラクター・分配履歴・変更したパスワード）を完全に削除して初期状態に戻します。よろしいですか？\n※この操作は元に戻せません。")) {
+        return;
+    }
+
+    const userInput = prompt("全データを一括削除するには、管理用パスワードを入力してください：");
+    if (userInput === null) return;
+
+    if (userInput !== savedPassword) {
+        alert("パスワードが違います。全データの削除は中止されました。");
+        return;
+    }
+
+    localStorage.removeItem("members");
+    localStorage.removeItem("history");
+    localStorage.removeItem("adminPassword");
+
+    alert("すべてのデータを完全に消去し、初期化しました。ページを再読み込みします。");
+    location.reload();
+}
+
 drawMembers();
 drawHistory();
 document.getElementById("date").valueAsDate = new Date();
@@ -970,4 +1087,3 @@ document.getElementById("date").valueAsDate = new Date();
 
 </body>
 </html>
-
