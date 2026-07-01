@@ -194,11 +194,9 @@ button.gray{
     text-align: center;
 }
 
-/* ステータスバッジ */
+/* ステータスバッジ（絶対配置を解除し、インラインブロックに変更） */
 .status-badge {
-    position: absolute;
-    top: 12px;
-    left: 15px;
+    display: inline-block;
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 11px;
@@ -234,9 +232,9 @@ button.gray{
     background: #ffcdd2;
 }
 
-/* アコーディオン構造 */
+/* アコーディオン構造（上部パディングを通常サイズに修正） */
 .accordion-header {
-    padding: 40px 15px 15px 15px; /* 上部にステータスバッジ用スペースを確保 */
+    padding: 15px; 
     background: white;
     cursor: pointer;
     display: flex;
@@ -248,11 +246,12 @@ button.gray{
 .accordion-header * {
     pointer-events: none;
 }
+/* タイトルブロック（縦並びの構成に変更してアイテム名を2行目に） */
 .accordion-title-block {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 5px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
     flex: 1;
 }
 .accordion-content {
@@ -876,11 +875,13 @@ function drawHistory(){
         area.innerHTML += `
         <div class="${openClass}">
             <div class="accordion-header" onclick="toggleAccordion(${index})">
-                ${badge}
                 <div class="flex-between" style="width: 100%;">
                     <div class="accordion-title-block">
-                        <span class="small" style="color:#777;">${h.date}</span>
-                        <strong style="font-size:15px; margin-left:5px;">${h.item}</strong>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            ${badge}
+                            <span class="small" style="color:#777;">${h.date}</span>
+                        </div>
+                        <strong style="font-size:15px; margin-top: 2px;">${h.item}</strong>
                     </div>
                     <div>
                         <span style="font-size:12px; color:#1976d2; font-weight:bold;">${arrow}</span>
