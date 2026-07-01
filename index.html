@@ -40,9 +40,8 @@ nav button{
     cursor:pointer;
     white-space: nowrap;
 }
-/* 選択されているタブを水色に変更 */
 nav button.active{
-    background:#2196f3; /* 濃い青から水色（ライトブルー）に変更 */
+    background:#2196f3; 
     color:white;
 }
 .page{
@@ -108,6 +107,16 @@ button.green{
     border-radius:6px;
     cursor:pointer;
 }
+button.orange{
+    background:#ff9800;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight: bold;
+    width: 100%;
+}
 button.gray{
     background:#757575;
     color:white;
@@ -116,8 +125,6 @@ button.gray{
     border-radius:6px;
     cursor:pointer;
 }
-
-/* 並び替えボタンのスタイル調整と選択時（active）の薄い水色設定 */
 .sort-btn-group button {
     border: 1px solid #ccc;
     background: #fff;
@@ -130,17 +137,14 @@ button.gray{
     border-color: #90caf9 !important;
     font-weight: bold;
 }
-
 .listItem{
     background:white;
     border-radius:10px;
     margin-bottom:10px;
     box-shadow:0 1px 4px rgba(0,0,0,.15);
     overflow: hidden;
-    border: 3px solid #ccc; /* デフォルト枠線 */
+    border: 3px solid #ccc; 
 }
-
-/* ステータスに応じた枠線色の定義 */
 .listItem.border-unpaid {
     border: 3px solid #ccc;
     border-left: 6px solid #9e9e9e;
@@ -153,7 +157,6 @@ button.gray{
     border: 3px solid #a5d6a7;
     border-left: 6px solid #4caf50;
 }
-
 .small{
     color:#666;
     font-size:13px;
@@ -163,7 +166,6 @@ button.gray{
     justify-content: space-between;
     align-items: center;
 }
-
 .member-selector {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -193,8 +195,6 @@ button.gray{
     border-radius: 8px;
     text-align: center;
 }
-
-/* ステータスバッジ（絶対配置を解除し、インラインブロックに変更） */
 .status-badge {
     display: inline-block;
     padding: 2px 6px;
@@ -207,7 +207,6 @@ button.gray{
 .badge-part { background: #ffe082; color: #b78103; }
 .badge-done { background: #c8e6c9; color: #2e7d32; }
 
-/* 未受取キャラバッジエリア */
 .unreceived-badges-wrapper {
     display: flex;
     flex-wrap: wrap;
@@ -215,8 +214,6 @@ button.gray{
     margin-top: 8px;
     width: 100%;
 }
-
-/* 未受取キャラバッジ */
 .unreceived-name-badge {
     background: #ffebee;
     color: #c62828;
@@ -231,8 +228,6 @@ button.gray{
 .unreceived-name-badge:hover {
     background: #ffcdd2;
 }
-
-/* アコーディオン構造（上部パディングを通常サイズに修正） */
 .accordion-header {
     padding: 15px; 
     background: white;
@@ -246,7 +241,6 @@ button.gray{
 .accordion-header * {
     pointer-events: none;
 }
-/* タイトルブロック（縦並びの構成に変更してアイテム名を2行目に） */
 .accordion-title-block {
     display: flex;
     flex-direction: column;
@@ -266,8 +260,6 @@ button.gray{
 .listItem.open .accordion-header {
     background: #f5f9ff;
 }
-
-/* 受取人チェックボタン */
 .receiver-list {
     display: flex;
     flex-wrap: wrap;
@@ -285,13 +277,11 @@ button.gray{
     transition: all 0.2s;
     user-select: none;
 }
-/* 個別の未受取（一括バッジの薄赤とは異なる、薄オレンジ系に設定） */
 .receiver-btn.unreceived {
     background: #fff3e0;
     border-color: #ffb74d;
     color: #e65100;
 }
-/* 個別の受取済 */
 .receiver-btn.received {
     background: #e8f5e9;
     border-color: #81c784;
@@ -305,8 +295,6 @@ button.gray{
     margin-bottom: 10px;
     border: 1px solid #1976d2;
 }
-
-/* モーダルスタイル */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -379,7 +367,6 @@ button.gray{
     color: #c62828;
     text-align: right;
 }
-/* 初回ログイン画面のスタイル */
 #auth-screen {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -399,9 +386,23 @@ button.gray{
     max-width: 400px;
     text-align: center;
 }
+#loading-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255,255,255,0.7);
+    z-index: 3000;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: #1976d2;
+    font-size: 18px;
+}
 </style>
 </head>
 <body>
+
+<div id="loading-overlay">通信中... ⏳</div>
 
 <div id="auth-screen" style="display: none;">
     <div class="auth-card">
@@ -424,12 +425,21 @@ button.gray{
 </nav>
 
 <div id="list" class="page active">
+    <div id="migration-box" class="card" style="background: #fff3e0; border: 2px dashed #ff9800; display: none;">
+        <h2 style="border-left-color: #ff9800; margin-bottom: 5px;">⚠️ クラウドへの移行確認</h2>
+        <p class="small" style="margin-bottom: 10px; color: #e65100;">スマホ（端末）に保存されている現在のデータを、スプレッドシートへ一度だけアップロードして同期を開始します。</p>
+        <button class="orange" onclick="forceUploadLocalToCloud()">現在のスマホデータをクラウドに引き継ぐ</button>
+    </div>
+
     <div class="card">
         <h2>分配一覧 <span style="font-size:12px; color:#666; font-weight:normal;">(タップで詳細を開閉 / 名前タップで一括管理)</span></h2>
         <div class="sort-btn-group" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 10px;">
             <button id="sort-date_desc" class="gray active" onclick="sortHistory('date_desc')" style="padding: 8px; font-size: 12px; border-radius: 6px; cursor: pointer;">日付（降順）</button>
             <button id="sort-date_asc" class="gray" onclick="sortHistory('date_asc')" style="padding: 8px; font-size: 12px; border-radius: 6px; cursor: pointer;">日付（昇順）</button>
             <button id="sort-status" class="gray" onclick="sortHistory('status')" style="padding: 8px; font-size: 12px; border-radius: 6px; cursor: pointer;">未分配優先</button>
+        </div>
+        <div style="text-align: right; margin-bottom: 10px;">
+            <button class="green" onclick="loadFromCloud()" style="padding: 5px 10px; font-size: 12px; width: auto; border-radius: 4px;">🔄 クラウドから再読込</button>
         </div>
         <div id="history"></div>
     </div>
@@ -450,24 +460,16 @@ button.gray{
 <div id="new" class="page">
     <div class="card">
         <h2>新規分配の作成</h2>
-        
         <label>日付</label>
         <input type="date" id="date">
-
         <label>アイテム名</label>
         <input id="item" placeholder="例：漆黒の腕輪">
-
         <label>総売却価格 (A) ※未売却時は空欄</label>
         <input type="number" id="price" placeholder="例：1000000" oninput="calcPreview()">
-
         <label>参加メンバーを選択</label>
-        <div id="participantList" class="member-selector">
-        </div>
-
+        <div id="participantList" class="member-selector"></div>
         <div class="summary-box">
-            <div id="calc-preview">
-                人数：0人 | 一人当たり：--- A
-            </div>
+            <div id="calc-preview">人数：0人 | 一人当たり：--- A</div>
         </div>
         <br>
         <button class="blue" onclick="saveHistory()">この内容で保存する</button>
@@ -479,36 +481,12 @@ button.gray{
         <h2>管理用パスワード変更</h2>
         <label>現在のパスワード</label>
         <input type="password" id="currentPassword" placeholder="現在のパスワードを入力">
-        
         <label>新しいパスワード</label>
         <input type="password" id="newPassword" placeholder="新しいパスワードを入力">
-        
         <label>新しいパスワード（確認用）</label>
         <input type="password" id="confirmPassword" placeholder="もう一度入力">
         <br><br>
         <button class="blue" onclick="changePassword()">パスワードを変更する</button>
-    </div>
-
-    <div class="card">
-        <h2>データのバックアップ（セーブ＆ロード）</h2>
-        <p class="small" style="margin-bottom: 15px; line-height: 1.4;">データの保存（バックアップ作成）、復元（読み込み）、初期データの取得を行えます。</p>
-        
-        <label>① 現在のデータを保存する</label>
-        <button class="blue" onclick="exportBackup()" style="width:100%; padding:15px; font-size:16px; font-weight:bold; border-radius:8px; cursor:pointer; margin-bottom: 10px;">バックアップファイル作成</button>
-        
-        <label>② 保存したファイルを読み込む</label>
-        <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importBackup(event)">
-        <button class="green" onclick="document.getElementById('importFile').click()" style="width:100%; padding:15px; font-size:16px; font-weight:bold; border-radius:8px; cursor:pointer; margin-bottom: 10px;">バックアップファイル読込</button>
-        
-        <label>③ 初期データを取得する</label>
-        <a id="downloadLink" href="panda_backup_2026-06-30 (1).json" download="panda_backup_2026-06-30 (1).json" style="display:none;"></a>
-        <button class="blue" onclick="document.getElementById('downloadLink').click()" style="width:100%; padding:15px; font-size:16px; font-weight:bold; border-radius:8px; background:#ff9800; cursor:pointer;">初回データダウンロード</button>
-    </div>
-
-    <div class="card" style="border: 1px solid #e53935;">
-        <h2 style="border-left-color: #e53935; color: #e53935;">全登録データの一括削除（初期化）</h2>
-        <p class="small" style="margin-bottom: 15px; line-height: 1.4;">現在登録されているすべてのキャラクターリスト、分配履歴、変更された管理用パスワードを一括削除して初期状態にリセットします。</p>
-        <button class="red" onclick="clearAllData()" style="width:100%; padding:15px; font-size:16px; font-weight:bold; border-radius:8px;">すべてのデータを一括削除する</button>
     </div>
 </div>
 
@@ -531,23 +509,140 @@ button.gray{
 </div>
 
 <script>
-let defaultMembers = [];
-let defaultHistory = [];
+// ⚠️ ご自身の Google ウェブアプリの URL を貼り付けてください
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxVuu_Xl3TijkN0K5aDeixopPn6rSZx3jrMlzSstnErXf20RxZkKbuGqPgYlw4oNPkBRA/exec";
 
-if(!localStorage.getItem("history")) localStorage.setItem("history", JSON.stringify(defaultHistory));
-if(!localStorage.getItem("members")) localStorage.setItem("members", JSON.stringify(defaultMembers));
-if(!localStorage.getItem("adminPassword")) localStorage.setItem("adminPassword", "1234");
-
-let members = JSON.parse(localStorage.getItem("members"));
-let history = JSON.parse(localStorage.getItem("history"));
+let members = [];
+let history = [];
+let adminPassword = "1234";
 let editingIndex = null;
 let openIndexes = {}; 
-let currentSortKey = "date_desc"; // 現在のソートキーを保持
+let currentSortKey = "date_desc"; 
+
+function showLoading(show) {
+    document.getElementById("loading-overlay").style.display = show ? "flex" : "none";
+}
+
+// ⬇️ スマホに残っている初期データを強制的にクラウドに送信する関数
+async function forceUploadLocalToCloud() {
+    if(!confirm("現在画面に出ているデータをスプレッドシート（クラウド）へ上書きアップロードします。よろしいですか？")) return;
+    
+    // スマホのローカルストレージからデータを吸い上げる
+    try {
+        const localM = localStorage.getItem("members");
+        const localH = localStorage.getItem("history");
+        const localP = localStorage.getItem("adminPassword");
+        
+        if(localM) members = JSON.parse(localM);
+        if(localH) history = JSON.parse(localH);
+        if(localP) adminPassword = localP;
+    } catch(e) {
+        alert("端末データの解析に失敗しました。");
+        return;
+    }
+
+    showLoading(true);
+    try {
+        const dataToSend = {
+            members: members,
+            history: history,
+            adminPassword: adminPassword
+        };
+        const res = await fetch(GAS_URL, {
+            method: "POST",
+            body: JSON.stringify(dataToSend)
+        });
+        const result = await res.json();
+        if(result.status === "success") {
+            alert("クラウドへの初期データ移行が完了しました！これ以降は全員でリアルタイムに共有されます。");
+            document.getElementById("migration-box").style.display = "none";
+            // 完了後はクラウドから最新を取得して再描画
+            await loadFromCloud();
+        } else {
+            alert("移行に失敗しました: " + result.message);
+        }
+    } catch (err) {
+        alert("通信エラーが発生しました。GASのURLやデプロイ設定（全員になっているか）を確認してください。");
+        console.error(err);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// クラウド（スプレッドシート）からデータを読み込む関数
+async function loadFromCloud() {
+    if(!GAS_URL || GAS_URL.startsWith("ここに")) {
+        alert("GASのURLが設定されていません。コード内の GAS_URL を書き換えてください。");
+        return;
+    }
+    showLoading(true);
+    try {
+        const response = await fetch(GAS_URL);
+        const data = await response.json();
+        
+        // クラウド側が完全空っぽ（初期状態）かつローカルにデータがある場合
+        const localM = localStorage.getItem("members");
+        const hasLocalData = localM && JSON.parse(localM).length > 0;
+        
+        if ((!data.members || data.members.length === 0) && hasLocalData) {
+            // オレンジ色の移行案内を表示する
+            document.getElementById("migration-box").style.display = "block";
+            
+            // クラウドから読めない間は一旦スマホのデータを表示しておく
+            members = JSON.parse(localStorage.getItem("members")) || [];
+            history = JSON.parse(localStorage.getItem("history")) || [];
+            adminPassword = localStorage.getItem("adminPassword") || "1234";
+        } else {
+            // 通常通りクラウドから読み込む
+            document.getElementById("migration-box").style.display = "none";
+            members = data.members || [];
+            history = data.history || [];
+            adminPassword = data.adminPassword || "1234";
+        }
+        
+        drawMembers();
+        updateSortButtonUI();
+        drawHistory();
+    } catch (err) {
+        console.error("クラウド読み込みエラー。ローカルデータを仮表示します:", err);
+        // 通信が失敗した場合は、ローカルデータを表示して移行ボタンを出す
+        document.getElementById("migration-box").style.display = "block";
+        members = JSON.parse(localStorage.getItem("members")) || [];
+        history = JSON.parse(localStorage.getItem("history")) || [];
+        adminPassword = localStorage.getItem("adminPassword") || "1234";
+        
+        drawMembers();
+        updateSortButtonUI();
+        drawHistory();
+    } finally {
+        showLoading(false);
+    }
+}
+
+async function saveToCloud() {
+    if(!GAS_URL || GAS_URL.startsWith("ここに")) return;
+    showLoading(true);
+    try {
+        const dataToSend = {
+            members: members,
+            history: history,
+            adminPassword: adminPassword
+        };
+        await fetch(GAS_URL, {
+            method: "POST",
+            body: JSON.stringify(dataToSend)
+        });
+    } catch (err) {
+        alert("クラウドへの保存に失敗しました。通信環境を確認してください。");
+        console.error(err);
+    } finally {
+        showLoading(false);
+    }
+}
 
 function checkFirstAuth() {
     const input = document.getElementById("authPassword").value;
-    const savedPassword = localStorage.getItem("adminPassword");
-    if (input === savedPassword) {
+    if (input === adminPassword) {
         localStorage.setItem("isPandaAuthed", "true");
         document.getElementById("auth-screen").style.display = "none";
         alert("認証に成功しました。");
@@ -572,12 +667,10 @@ function sortHistory(key) {
         history.sort((a, b) => getStatusScore(a) - getStatusScore(b));
     }
     openIndexes = {};
-    saveLocal();
     updateSortButtonUI();
     drawHistory();
 }
 
-// 並び替えボタンの見た目を更新する関数
 function updateSortButtonUI() {
     document.querySelectorAll('.sort-btn-group button').forEach(btn => {
         btn.classList.remove('active');
@@ -613,18 +706,12 @@ function showPage(id, obj){
     }
 }
 
-function saveLocal(){
-    localStorage.setItem("members", JSON.stringify(members));
-    localStorage.setItem("history", JSON.stringify(history));
-}
-
-function changePassword(){
+async function changePassword(){
     const currentInput = document.getElementById("currentPassword").value;
     const newInput = document.getElementById("newPassword").value.trim();
     const confirmInput = document.getElementById("confirmPassword").value;
-    const savedPassword = localStorage.getItem("adminPassword");
 
-    if(currentInput !== savedPassword){
+    if(currentInput !== adminPassword){
         alert("現在のパスワードが正しくありません");
         return;
     }
@@ -637,7 +724,8 @@ function changePassword(){
         return;
     }
 
-    localStorage.setItem("adminPassword", newInput);
+    adminPassword = newInput;
+    await saveToCloud();
     alert("パスワードを変更しました！");
     
     document.getElementById("currentPassword").value = "";
@@ -646,7 +734,7 @@ function changePassword(){
     showPage('list', document.getElementById('nav-list'));
 }
 
-function addMember(event){
+async function addMember(event){
     if(event) event.preventDefault();
     let name = document.getElementById("memberName").value.trim();
     if(name == "") return;
@@ -656,14 +744,14 @@ function addMember(event){
     }
     members.push(name);
     document.getElementById("memberName").value = "";
-    saveLocal();
+    await saveToCloud();
     drawMembers();
 }
 
 function drawMembers(){
     const list = document.getElementById("memberList");
     list.innerHTML = "";
-    if(members.length === 0){
+    if(!members || members.length === 0){
         list.innerHTML = "<div class='small'>キャラが登録されていません</div>";
         return;
     }
@@ -677,17 +765,17 @@ function drawMembers(){
     });
 }
 
-function deleteMember(index){
+async function deleteMember(index){
     if(!confirm("削除してもよろしいですか？")) return;
     members.splice(index, 1);
-    saveLocal();
+    await saveToCloud();
     drawMembers();
 }
 
 function drawParticipantSelector(){
     const area = document.getElementById("participantList");
     area.innerHTML = "";
-    if(members.length === 0){
+    if(!members || members.length === 0){
         area.innerHTML = "<div class='small' style='grid-column:1/3'>キャラ登録を先に行ってください</div>";
         return;
     }
@@ -718,7 +806,7 @@ function calcPreview(){
     `;
 }
 
-function saveHistory(){
+async function saveHistory(){
     const date = document.getElementById("date").value;
     const item = document.getElementById("item").value.trim();
     const priceInput = document.getElementById("price").value;
@@ -750,7 +838,7 @@ function saveHistory(){
         onePrice: onePrice
     });
 
-    saveLocal();
+    await saveToCloud();
     drawHistory();
 
     document.getElementById("item").value = "";
@@ -776,7 +864,7 @@ function cancelEdit() {
     drawHistory();
 }
 
-function updateHistory(index) {
+async function updateHistory(index) {
     const editItem = document.getElementById(`editItem-${index}`).value.trim();
     const editPriceInput = document.getElementById(`editPrice-${index}`).value;
     
@@ -793,7 +881,7 @@ function updateHistory(index) {
     history[index].price = price;
     history[index].onePrice = onePrice;
 
-    saveLocal();
+    await saveToCloud();
     editingIndex = null;
     drawHistory();
     alert("変更を保存しました");
@@ -803,7 +891,7 @@ function drawHistory(){
     const area = document.getElementById("history");
     area.innerHTML = "";
 
-    if(history.length === 0){
+    if(!history || history.length === 0){
         area.innerHTML = "<div class='small'>履歴がありません</div>";
         return;
     }
@@ -815,7 +903,6 @@ function drawHistory(){
         const total = h.participants.length;
         const doneCount = h.participants.filter(p => p.received).length;
 
-        // ステータスバッジと枠線クラスの判定
         let badge = `<span class="status-badge badge-unpaid">未分配</span>`;
         let borderClass = "border-unpaid";
         
@@ -894,7 +981,6 @@ function drawHistory(){
                         <span style="font-size:12px; color:#1976d2; font-weight:bold;">${arrow}</span>
                     </div>
                 </div>
-                
                 ${unreceivedBadgesHtml}
             </div>
             
@@ -911,7 +997,6 @@ function drawHistory(){
                         ${receiverButtons}
                     </div>
                 </div>
-
                 <div class="flex-between" style="border-top:1px solid #eee; padding-top:10px;">
                     <button class="gray" style="padding:6px 14px; font-size:13px;" onclick="startEdit(${index})">再編集 ✏️</button>
                     <button class="red" onclick="deleteHistory(${index})">削除</button>
@@ -958,7 +1043,6 @@ function setupReceiverButtonEvents() {
             e.preventDefault();
             endPress(e);
         });
-
         btn.addEventListener('mousedown', (e) => {
             e.stopPropagation();
             if (e.button === 0) startPress(e);
@@ -973,46 +1057,39 @@ function setupReceiverButtonEvents() {
     });
 }
 
-function handleReceiverPress(historyIndex, participantIndex, forceSelectDate) {
+async function handleReceiverPress(historyIndex, participantIndex, forceSelectDate) {
     const currentStatus = history[historyIndex].participants[participantIndex].received;
     const name = history[historyIndex].participants[participantIndex].name;
-    const savedPassword = localStorage.getItem("adminPassword");
 
     if (currentStatus === true) {
         if (!confirm(`${name} さんを「未受取」に戻します。よろしいですか？`)) return;
-
         const userInput = prompt("受取を戻すには管理用パスワードを入力してください：");
         if (userInput === null) return;
-
-        if (userInput !== savedPassword) {
+        if (userInput !== adminPassword) {
             alert("パスワードが違います。変更できません。");
             return;
         }
-        
         history[historyIndex].participants[participantIndex].received = false;
         history[historyIndex].participants[participantIndex].receivedDate = null;
     } else {
         let receiveDate = "";
         const todayStr = new Date().toISOString().split('T')[0];
-
         if (forceSelectDate) {
             receiveDate = prompt(`${name} さんの受取日を入力してください：`, todayStr);
             if (receiveDate === null) return;
         } else {
             receiveDate = todayStr;
         }
-
         history[historyIndex].participants[participantIndex].received = true;
         history[historyIndex].participants[participantIndex].receivedDate = receiveDate;
     }
     
-    saveLocal();
+    await saveToCloud();
     drawHistory();
 }
 
 function openUnreceivedSummary(memberName) {
     document.getElementById("modalTitle").innerText = `【${memberName}】の未受取明細`;
-    
     const listArea = document.getElementById("modalItemList");
     listArea.innerHTML = "";
     
@@ -1027,7 +1104,6 @@ function openUnreceivedSummary(memberName) {
             if (h.onePrice !== null) {
                 totalUnreceivedSum += h.onePrice;
             }
-            
             listArea.innerHTML += `
                 <div class="unreceived-item-row">
                     <span style="color:#777; font-size:12px;">[${h.date}]</span> 
@@ -1052,7 +1128,6 @@ function openUnreceivedSummary(memberName) {
             bulkReceiveAction(memberName);
         };
     }
-
     document.getElementById("unreceivedModal").classList.add("active");
 }
 
@@ -1060,21 +1135,14 @@ function closeModal() {
     document.getElementById("unreceivedModal").classList.remove("active");
 }
 
-function bulkReceiveAction(memberName) {
-    const savedPassword = localStorage.getItem("adminPassword");
-    
-    if (!confirm(`${memberName} さんの未受取アイテムをすべて「受取済」に変更します。よろしいですか？`)) {
-        return;
-    }
-
+async function bulkReceiveAction(memberName) {
+    if (!confirm(`${memberName} さんの未受取アイテムをすべて「受取済」に変更します。よろしいですか？`)) return;
     const userInput = prompt("一括処理を行うには管理用パスワードを入力してください：");
     if (userInput === null) return;
-
-    if (userInput !== savedPassword) {
+    if (userInput !== adminPassword) {
         alert("パスワードが違います。変更できませんでした。");
         return;
     }
-
     const todayStr = new Date().toISOString().split('T')[0];
     const receiveDate = prompt("受取日を入力してください：", todayStr);
     if (receiveDate === null) return;
@@ -1088,115 +1156,34 @@ function bulkReceiveAction(memberName) {
         });
     });
 
-    saveLocal();
+    await saveToCloud();
     drawHistory();
     closeModal();
     alert(`${memberName} さんの未受取アイテムを一括受取済にしました。`);
 }
 
-function deleteHistory(index){
-    const savedPassword = localStorage.getItem("adminPassword");
-    
+async function deleteHistory(index){
     if(!confirm("この履歴を完全に削除しますか？")) return;
-    
     const userInput = prompt("削除するには管理用パスワードを入力してください：");
     if (userInput === null) return;
-
-    if (userInput !== savedPassword) {
+    if (userInput !== adminPassword) {
         alert("パスワードが違います。削除できません。");
         return;
     }
-
     history.splice(index, 1);
     delete openIndexes[index];
-    saveLocal();
+    await saveToCloud();
     drawHistory();
     alert("削除しました。");
 }
 
-function exportBackup() {
-    const backupData = {
-        members: JSON.parse(localStorage.getItem("members")),
-        history: JSON.parse(localStorage.getItem("history")),
-        adminPassword: localStorage.getItem("adminPassword")
-    };
-    
-    const jsonString = JSON.stringify(backupData, null, 2);
-    const blob = new Blob([jsonString], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement("a");
-    const today = new Date().toISOString().split('T')[0];
-    a.href = url;
-    a.download = `panda_backup_${today}.json`;
-    a.click();
-    
-    URL.revokeObjectURL(url);
+async function initApp() {
+    initAuth();
+    await loadFromCloud();
+    document.getElementById("date").valueAsDate = new Date();
 }
 
-function importBackup(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    if (!confirm("バックアップファイルを読み込むと、現在のデータ（メンバーリスト、履歴、パスワード）はすべて上書きされます。よろしいですか？")) {
-        event.target.value = ""; 
-        return;
-    }
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = JSON.parse(e.target.result);
-            if (data.members && data.history) {
-                localStorage.setItem("members", JSON.stringify(data.members));
-                localStorage.setItem("history", JSON.stringify(data.history));
-                if (data.adminPassword) {
-                    localStorage.setItem("adminPassword", data.adminPassword);
-                }
-                
-                alert("データの復元（ロード）が完了しました！ページを再読み込みします。");
-                location.reload();
-            } else {
-                alert("正しいバックアップファイルではないか、データ構造が破損しています。");
-            }
-        } catch (err) {
-            alert("ファイルの読み込みに失敗しました。正しいJSONファイルかご確認ください。");
-        }
-    };
-    reader.readAsText(file);
-    event.target.value = ""; 
-}
-
-function clearAllData() {
-    const savedPassword = localStorage.getItem("adminPassword");
-    
-    if (!confirm("【警告】現在登録されているすべてのデータ（キャラクター・分配履歴・変更したパスワード）を完全に削除して初期状態に戻します。よろしいですか？\n※この操作は元に戻せません。")) {
-        return;
-    }
-
-    const userInput = prompt("全データを一括削除するには、管理用パスワードを入力してください：");
-    if (userInput === null) return;
-
-    if (userInput !== savedPassword) {
-        alert("パスワードが違います。全データの削除は中止されました。");
-        return;
-    }
-
-    localStorage.removeItem("members");
-    localStorage.removeItem("history");
-    localStorage.removeItem("adminPassword");
-    localStorage.removeItem("isPandaAuthed");
-
-    alert("すべてのデータを完全に消去し、初期化しました。ページを再読み込みします。");
-    location.reload();
-}
-
-initAuth();
-drawMembers();
-updateSortButtonUI();
-drawHistory();
-document.getElementById("date").valueAsDate = new Date();
+initApp();
 </script>
-
 </body>
 </html>
