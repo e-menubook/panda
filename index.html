@@ -40,8 +40,9 @@ nav button{
     cursor:pointer;
     white-space: nowrap;
 }
+/* 選択されているタブを水色に変更 */
 nav button.active{
-    background:#1976d2;
+    background:#2196f3; /* 濃い青から水色（ライトブルー）に変更 */
     color:white;
 }
 .page{
@@ -175,12 +176,12 @@ button.gray{
 .badge-part { background: #ffe082; color: #b78103; }
 .badge-done { background: #c8e6c9; color: #2e7d32; }
 
-/* 未受取キャラバッジエリア（2行目・左寄せ用） */
+/* 未受取キャラバッジエリア */
 .unreceived-badges-wrapper {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    margin-top: 6px; /* 1行目との間隔 */
+    margin-top: 6px;
     width: 100%;
 }
 
@@ -194,7 +195,7 @@ button.gray{
     font-size: 11px;
     white-space: nowrap;
     cursor: pointer;
-    pointer-events: auto !important; /* ヘッダー全体のpointer-events:noneを打ち共す */
+    pointer-events: auto !important;
 }
 .unreceived-name-badge:hover {
     background: #ffcdd2;
@@ -206,7 +207,7 @@ button.gray{
     background: white;
     cursor: pointer;
     display: flex;
-    flex-direction: column; /* 縦並び（2行構成）にする */
+    flex-direction: column;
     align-items: flex-start;
     user-select: none;
 }
@@ -265,7 +266,7 @@ button.gray{
     border: 1px solid #1976d2;
 }
 
-/* モーダル（別窓）スタイル */
+/* モーダルスタイル */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -338,9 +339,38 @@ button.gray{
     color: #c62828;
     text-align: right;
 }
+/* 初回ログイン画面のスタイル */
+#auth-screen {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #f3f5f7;
+    z-index: 2000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+.auth-card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
 </style>
 </head>
 <body>
+
+<div id="auth-screen" style="display: none;">
+    <div class="auth-card">
+        <h2 style="border: none; padding: 0; font-size: 20px; margin-bottom: 10px;">ぱんだの分配管理</h2>
+        <p class="small" style="margin-bottom: 20px;">初回起動のため管理用パスワードを入力してください。</p>
+        <input type="password" id="authPassword" placeholder="パスワードを入力">
+        <button class="blue" onclick="checkFirstAuth()" style="margin-top: 10px;">ログイン</button>
+    </div>
+</div>
 
 <header>
 ぱんだの分配管理
@@ -408,7 +438,7 @@ button.gray{
     <div class="card">
         <h2>管理用パスワード変更</h2>
         <label>現在のパスワード</label>
-        <input type="password" id="currentPassword" placeholder="初期値は 1234">
+        <input type="password" id="currentPassword" placeholder="現在のパスワードを入力">
         
         <label>新しいパスワード</label>
         <input type="password" id="newPassword" placeholder="新しいパスワードを入力">
@@ -472,6 +502,24 @@ let members = JSON.parse(localStorage.getItem("members"));
 let history = JSON.parse(localStorage.getItem("history"));
 let editingIndex = null;
 let openIndexes = {}; 
+
+function checkFirstAuth() {
+    const input = document.getElementById("authPassword").value;
+    const savedPassword = localStorage.getItem("adminPassword");
+    if (input === savedPassword) {
+        localStorage.setItem("isPandaAuthed", "true");
+        document.getElementById("auth-screen").style.display = "none";
+        alert("認証に成功しました。");
+    } else {
+        alert("パスワードが違います。");
+    }
+}
+
+function initAuth() {
+    if (!localStorage.getItem("isPandaAuthed")) {
+        document.getElementById("auth-screen").style.display = "flex";
+    }
+}
 
 function sortHistory(key) {
     if (key === 'date_desc') {
@@ -1075,11 +1123,13 @@ function clearAllData() {
     localStorage.removeItem("members");
     localStorage.removeItem("history");
     localStorage.removeItem("adminPassword");
+    localStorage.removeItem("isPandaAuthed");
 
     alert("すべてのデータを完全に消去し、初期化しました。ページを再読み込みします。");
     location.reload();
 }
 
+initAuth();
 drawMembers();
 drawHistory();
 document.getElementById("date").valueAsDate = new Date();
